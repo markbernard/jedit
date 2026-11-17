@@ -55,7 +55,7 @@ public class ApplicationPreferences {
         currentFilePath = prefs.get(LAST_FILE_PATH, System.getProperty("user.home"));
         wordWrap = prefs.getBoolean(WORD_WRAP, false);
         statusBar = prefs.getBoolean(STATUS_BAR, true);
-        currentFont = new Font(prefs.get(FONT_FAMILY, "monospaced"), prefs.getInt(FONT_STYLE, Font.PLAIN), prefs.getInt(FONT_SIZE, 16));
+        currentFont = new Font(prefs.get(FONT_FAMILY, "Hack"), prefs.getInt(FONT_STYLE, Font.PLAIN), prefs.getInt(FONT_SIZE, 16));
         for (int i=0;i<9;i++) {
             String document = prefs.get(i + RECENT_DOCUMENTS, null);
             if (document != null) {

@@ -47,6 +47,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
@@ -90,6 +91,20 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private static final long serialVersionUID = -6937922244390572212L;
     private static final String[] NEW_LINE_CHAR = {"\n", "\r\n"};
 //    private static final String[] REGEX_NEW_LINE_CHAR = {"\\n", "\\r\\n"};
+
+    //Lists of extensions for each comment type
+    private static final Set<String> cComment = new TreeSet<>();
+    
+    static {
+        cComment.add("c");
+        cComment.add("cpp");
+        cComment.add("cs");
+        cComment.add("java");
+        cComment.add("js");
+        cComment.add("php");
+        cComment.add("scala");
+        cComment.add("ts");
+    }
     
     private JNotepad jNotepad;
     private RSyntaxTextArea syntaxTextArea;
@@ -105,6 +120,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private boolean readOnly;
     private RUndoManager undoManager;
     private Charset charset;
+    private Point caratPosition;
 
     /**
      * @param jNotepad 
@@ -451,8 +467,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private void updateStatusBar(int position) {
         try {
             //solution for row and column from http://java-sl.com/tip_row_column.html
-            Point caratPosition = calculatePosition(position);
-            jNotepad.updateStatusBar(String.format("Ln %d, Col %d", caratPosition.x, caratPosition.y));
+            caratPosition = calculatePosition(position);
+            jNotepad.updateStatusBar(String.format("Ln %d, Col %d", caratPosition.y, caratPosition.x));
         } catch (Exception e) {
             //not critical if the position in the
             //status bar does not get updated.
@@ -479,7 +495,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             line++;
         }
         
-        return new Point(line, column);
+        return new Point(column, line);
     }
 
     /**
@@ -546,9 +562,6 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             }
             syntaxTextArea.setText(content.toString());
             setLanguageInfo(DocumentFormatType.determineFormatFromFile(path.getAbsolutePath()));
-            Font currentFont = syntaxTextArea.getFont();
-            Font newFont = new Font("Consolas", currentFont.getStyle(), currentFont.getSize());
-            syntaxTextArea.setFont(newFont);
             in.close();
             undoManager.discardAllEdits();
             dirty = false;
@@ -859,6 +872,31 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             jNotepad.setTitle();
         }
         repaint();
+    }
+
+    /**
+     * 
+     */
+    public void uppercase() {
+        int selectionStart = syntaxTextArea.getSelectionStart();
+        int selectionEnd = syntaxTextArea.getSelectionEnd();
+        
+        if (selectionStart != selectionEnd) {
+            syntaxTextArea.replaceRange(syntaxTextArea.getSelectedText().toUpperCase(), selectionStart, selectionEnd);
+        }
+    }
+    
+    /**
+     * 
+     */
+    public void lowercase() {
+        int selectionStart = syntaxTextArea.getSelectionStart();
+        int selectionEnd = syntaxTextArea.getSelectionEnd();
+        
+        if (selectionStart != selectionEnd) {
+            syntaxTextArea.replaceRange(syntaxTextArea.getSelectedText().toLowerCase(), selectionStart, selectionEnd);
+        }
+        
     }
 
     enum DirtyStatus {

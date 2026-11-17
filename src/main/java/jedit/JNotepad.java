@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -155,6 +156,13 @@ public class JNotepad implements WindowListener, KeyListener {
         editMenu.add(editGoToMenuItem);
         JMenuItem editSelectAllMenuItem = new JMenuItem(new EditAction.SelectAllAction(this));
         editMenu.add(editSelectAllMenuItem);
+        editMenu.addSeparator();
+        JMenuItem uppercaseMenuItem = new JMenuItem(new EditAction.UppercaseAction(this));
+        editMenu.add(uppercaseMenuItem);
+        JMenuItem lowercaseMenuItem = new JMenuItem(new EditAction.LowercaseAction(this));
+        editMenu.add(lowercaseMenuItem);
+        JMenuItem toggleCommentMenuItem = new JMenuItem(new EditAction.ToggleCommentAction());
+        editMenu.add(toggleCommentMenuItem);
 
         JMenu documentMenu = new JMenu(new DocumentAction());
         bar.add(documentMenu);
@@ -717,6 +725,20 @@ public class JNotepad implements WindowListener, KeyListener {
     }
 
     /**
+     * 
+     */
+    public void uppercase() {
+        currentDocument.uppercase();
+    }
+    
+    /**
+     * 
+     */
+    public void lowercase() {
+        currentDocument.lowercase();
+    }
+
+    /**
      * Exit while saving prefrenecs and checking if save is required.
      */
     public void exit() {
@@ -785,6 +807,26 @@ public class JNotepad implements WindowListener, KeyListener {
      * @param args
      */
     public static void main(String... args) {
+        String[] fontFiles = {
+                "/fonts/Hack-Bold.ttf",
+                "/fonts/Hack-BoldItalic.ttf",
+                "/fonts/Hack-Italic.ttf",
+                "/fonts/Hack-Regular.ttf"
+        };
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        for (String path : fontFiles) {
+            try {
+                // Use Font.TRUETYPE_FONT for both .ttf and .otf files
+                Font font = Font.createFont(Font.TRUETYPE_FONT, JNotepad.class.getResourceAsStream(path));
+                ge.registerFont(font);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        ApplicationPreferences.setCurrentFont(new Font("Hack", Font.PLAIN, 16));
         try {
             // Make the application look native.
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

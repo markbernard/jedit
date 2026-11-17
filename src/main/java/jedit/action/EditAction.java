@@ -27,6 +27,8 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
+
 import jedit.IconGenerator;
 import jedit.JNotepad;
 import jedit.dialog.SearchDialog;
@@ -422,6 +424,90 @@ public class EditAction extends AbstractAction {
                     jNotepad.selectAll();
                 }
             }, "Select All").start();
+        }
+    }
+
+    /**
+     * Actions for the Edit > Uppercase menu item.
+     * 
+     * @author Mark Bernard
+     */
+    public static class UppercaseAction extends AbstractAction {
+        private static final long serialVersionUID = 1215020210624036643L;
+        private JNotepad jNotepad;
+
+        /**
+         * Set up values appropriate to the Select All menu item.
+         * 
+         * @param jNotepad 
+         */
+        public UppercaseAction(JNotepad jNotepad) {
+            this.jNotepad = jNotepad;
+            putValue(MNEMONIC_KEY, KeyEvent.VK_U);
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+            putValue(NAME, "Uppercase");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    jNotepad.uppercase();
+                }
+            }, "Uppercase").start();
+        }
+    }
+
+    /**
+     * Actions for the Edit > Lowercase menu item.
+     * 
+     * @author Mark Bernard
+     */
+    public static class LowercaseAction extends AbstractAction {
+        private static final long serialVersionUID = 1215020210624036643L;
+        private JNotepad jNotepad;
+
+        /**
+         * Set up values appropriate to the Select All menu item.
+         * 
+         * @param jNotepad 
+         */
+        public LowercaseAction(JNotepad jNotepad) {
+            this.jNotepad = jNotepad;
+            putValue(MNEMONIC_KEY, KeyEvent.VK_U);
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
+            putValue(NAME, "Lowercase");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    jNotepad.lowercase();
+                }
+            }, "Lowercase").start();
+        }
+    }
+
+    /**
+     * Actions for the Edit > Toggle Comment menu item.
+     * 
+     * @author Mark Bernard
+     */
+    public static class ToggleCommentAction extends RSyntaxTextAreaEditorKit.ToggleCommentAction {
+        private static final long serialVersionUID = 1215020210624036643L;
+
+        /**
+         * Set up values appropriate to the Select All menu item.
+         * 
+         * @param jNotepad 
+         */
+        public ToggleCommentAction() {
+            putValue(MNEMONIC_KEY, KeyEvent.VK_C);
+            putValue(NAME, "Toggle Comment");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK));
         }
     }
 }

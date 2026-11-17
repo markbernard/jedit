@@ -12,14 +12,17 @@ public class LanguageInfo {
     private String language;
     private String name;
     private String description;
+    private String extension;
+    
     /**
      * @param language
      * @param name
+     * @param extension 
      */
-    public LanguageInfo(String language, String name) {
-        super();
+    public LanguageInfo(String language, String name, String extension) {
         this.language = language;
         this.name = name;
+        this.extension = extension;
     }
     /**
      * @return the language
@@ -57,6 +60,19 @@ public class LanguageInfo {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    /**
+     * @return the extension
+     */
+    public String getExtension() {
+        return extension;
+    }
+    /**
+     * @param extension the extension to set
+     */
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
     @Override
     public int hashCode() {
         return Objects.hash(language);
@@ -77,6 +93,11 @@ public class LanguageInfo {
     }
     @Override
     public String toString() {
-        return "LanguageInfo [language=" + language + ", name=" + name + ", description=" + description + "]";
+        return "LanguageInfo "
+                + "[language=" + language 
+                + ", name=" + name 
+                + ", description=" + description
+                + ", extension=" + extension
+                + "]";
     }
 }
