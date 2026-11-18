@@ -36,7 +36,7 @@ import javax.swing.JPanel;
  */
 public class TabComponent extends JPanel implements MouseListener {
     private static final long serialVersionUID = 2208710958031050223L;
-    private JNotepad jNotepad;
+    private JEdit jNotepad;
     private JLabel labelName;
     private SimpleIcon simpleIcon;
 
@@ -44,7 +44,7 @@ public class TabComponent extends JPanel implements MouseListener {
      * @param jNotepad 
      * @param componentName 
      */
-    public TabComponent(JNotepad jNotepad, String componentName) {
+    public TabComponent(JEdit jNotepad, String componentName) {
         this.jNotepad = jNotepad;
         setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
         setLayout(new BorderLayout(10, 0));

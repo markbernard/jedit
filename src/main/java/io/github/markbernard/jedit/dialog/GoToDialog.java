@@ -34,7 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.PlainDocument;
 
-import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.JEdit;
 
 /**
  * @author Mark Bernard
@@ -51,7 +51,7 @@ public class GoToDialog extends BasicDialog {
      * @param frame 
      * @param jNotepad 
      */
-    public GoToDialog(JFrame frame, JNotepad jNotepad) {
+    public GoToDialog(JFrame frame, JEdit jNotepad) {
         super(frame, "Go To Line", true);
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel(new BorderLayout());

@@ -92,7 +92,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
 //    private static final String[] REGEX_NEW_LINE_CHAR = {"\\n", "\\r\\n"};
 
     
-    private JNotepad jNotepad;
+    private JEdit jNotepad;
     private RSyntaxTextArea syntaxTextArea;
     private RTextScrollPane textScrollPane;
     private LanguageInfo languageInfo;
@@ -112,7 +112,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @param jNotepad 
      * @param documentNumber Number to place beside new in the new file name.
      */
-    public TextDocument(JNotepad jNotepad, int documentNumber) {
+    public TextDocument(JEdit jNotepad, int documentNumber) {
         this.jNotepad = jNotepad;
         newFileName = "new " + documentNumber;
         fileName = newFileName;
@@ -124,7 +124,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @param jNotepad 
      * @param file Full path to the file
      */
-    public TextDocument(JNotepad jNotepad, File file) {
+    public TextDocument(JEdit jNotepad, File file) {
         this.jNotepad = jNotepad;
         parseFileName(file.getAbsolutePath().replace("\\", "/"));
         createGui();

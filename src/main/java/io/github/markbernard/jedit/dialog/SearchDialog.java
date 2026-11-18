@@ -39,7 +39,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.JEdit;
 import io.github.markbernard.jedit.action.DialogAction;
 import io.github.markbernard.jedit.action.EditAction;
 
@@ -66,7 +66,7 @@ public class SearchDialog extends BasicDialog implements DocumentListener {
      * @param jNotepad 
      * @param replace set to true to show replace dialog, false to only show find
      */
-    public SearchDialog(JFrame frame, JNotepad jNotepad, boolean replace) {
+    public SearchDialog(JFrame frame, JEdit jNotepad, boolean replace) {
         super(frame, (replace ? "Replace" : "Find"), false);
         this.replace = replace;
         setLayout(new BorderLayout());

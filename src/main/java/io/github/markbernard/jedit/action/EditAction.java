@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 
 import io.github.markbernard.jedit.IconGenerator;
-import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.JEdit;
 import io.github.markbernard.jedit.dialog.SearchDialog;
 
 /**
@@ -61,14 +61,14 @@ public class EditAction extends AbstractAction {
     public static class UndoAction extends AbstractAction {
         private static final long serialVersionUID = 5936711805304319306L;
         
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
         
         /**
          * Set up values appropriate to the Undo menu item.
          * 
          * @param jNotepad 
          */
-        public UndoAction(JNotepad jNotepad) {
+        public UndoAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
@@ -98,14 +98,14 @@ public class EditAction extends AbstractAction {
     public static class RedoAction extends AbstractAction {
         private static final long serialVersionUID = 6599265610327179684L;
 
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
         
         /**
          * Set up values appropriate to the Undo menu item.
          * 
          * @param jNotepad 
          */
-        public RedoAction(JNotepad jNotepad) {
+        public RedoAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
@@ -134,14 +134,14 @@ public class EditAction extends AbstractAction {
      */
     public static class CutAction extends AbstractAction {
         private static final long serialVersionUID = 6520482354999730690L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Cut menu item.
          * 
          * @param jNotepad 
          */
-        public CutAction(JNotepad jNotepad) {
+        public CutAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_T);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
@@ -169,14 +169,14 @@ public class EditAction extends AbstractAction {
      */
     public static class CopyAction extends AbstractAction {
         private static final long serialVersionUID = -2906245309033009826L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Copy menu item.
          * 
          * @param jNotepad 
          */
-        public CopyAction(JNotepad jNotepad) {
+        public CopyAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_C);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
@@ -204,14 +204,14 @@ public class EditAction extends AbstractAction {
      */
     public static class PasteAction extends AbstractAction {
         private static final long serialVersionUID = -555624621599811242L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Paste menu item.
          * 
          * @param jNotepad 
          */
-        public PasteAction(JNotepad jNotepad) {
+        public PasteAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
@@ -239,14 +239,14 @@ public class EditAction extends AbstractAction {
      */
     public static class FindAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Find menu item.
          * 
          * @param jNotepad 
          */
-        public FindAction(JNotepad jNotepad) {
+        public FindAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
@@ -274,7 +274,7 @@ public class EditAction extends AbstractAction {
      */
     public static class FindNextAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
         private SearchDialog searchDialog;
 
         /**
@@ -283,7 +283,7 @@ public class EditAction extends AbstractAction {
          * @param jNotepad 
          * @param searchDialog 
          */
-        public FindNextAction(JNotepad jNotepad, SearchDialog searchDialog) {
+        public FindNextAction(JEdit jNotepad, SearchDialog searchDialog) {
             this.jNotepad = jNotepad;
             this.searchDialog = searchDialog;
             if (searchDialog == null) {
@@ -327,14 +327,14 @@ public class EditAction extends AbstractAction {
      */
     public static class ReplaceAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Replace menu item.
          * 
          * @param jNotepad 
          */
-        public ReplaceAction(JNotepad jNotepad) {
+        public ReplaceAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
@@ -362,14 +362,14 @@ public class EditAction extends AbstractAction {
      */
     public static class GoToAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Go To menu item.
          * 
          * @param jNotepad 
          */
-        public GoToAction(JNotepad jNotepad) {
+        public GoToAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_L);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
@@ -398,14 +398,14 @@ public class EditAction extends AbstractAction {
      */
     public static class SelectAllAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Select All menu item.
          * 
          * @param jNotepad 
          */
-        public SelectAllAction(JNotepad jNotepad) {
+        public SelectAllAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
@@ -434,14 +434,14 @@ public class EditAction extends AbstractAction {
      */
     public static class UppercaseAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Select All menu item.
          * 
          * @param jNotepad 
          */
-        public UppercaseAction(JNotepad jNotepad) {
+        public UppercaseAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
@@ -466,14 +466,14 @@ public class EditAction extends AbstractAction {
      */
     public static class LowercaseAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Select All menu item.
          * 
          * @param jNotepad 
          */
-        public LowercaseAction(JNotepad jNotepad) {
+        public LowercaseAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));

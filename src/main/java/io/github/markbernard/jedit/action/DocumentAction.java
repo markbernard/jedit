@@ -28,7 +28,7 @@ import javax.swing.Action;
 
 import io.github.markbernard.jedit.ApplicationPreferences;
 import io.github.markbernard.jedit.IconGenerator;
-import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.JEdit;
 import io.github.markbernard.jedit.LanguageInfo;
 
 /**
@@ -56,13 +56,13 @@ public class DocumentAction extends AbstractAction {
         private static final long serialVersionUID = -7155740870533895459L;
         private static WordWrapAction instance;
         
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * @param jNotepad
          * @return Single instance
          */
-        public static WordWrapAction getInstance(JNotepad jNotepad) {
+        public static WordWrapAction getInstance(JEdit jNotepad) {
             if (instance == null) {
                 instance = new WordWrapAction(jNotepad);
             }
@@ -75,7 +75,7 @@ public class DocumentAction extends AbstractAction {
          * 
          * @param jNotepad 
          */
-        private WordWrapAction(JNotepad jNotepad) {
+        private WordWrapAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
             putValue(Action.NAME, "Word Wrap");
@@ -128,14 +128,14 @@ public class DocumentAction extends AbstractAction {
         public static class LanguageChoiceAction extends AbstractAction {
             private static final long serialVersionUID = -6070781993396455988L;
 
-            private JNotepad jNotepad;
+            private JEdit jNotepad;
             private LanguageInfo languageInfo;
 
             /**
              * @param jNotepad
              * @param languageInfo
              */
-            public LanguageChoiceAction(JNotepad jNotepad, LanguageInfo languageInfo) {
+            public LanguageChoiceAction(JEdit jNotepad, LanguageInfo languageInfo) {
                 this.jNotepad = jNotepad;
                 this.languageInfo = languageInfo;
                 putValue(NAME, languageInfo.getName());
@@ -176,14 +176,14 @@ public class DocumentAction extends AbstractAction {
         public static class CharsetAction extends AbstractAction {
             private static final long serialVersionUID = 8848351864190448190L;
 
-            private JNotepad jNotepad;
+            private JEdit jNotepad;
             private Charset charset;
 
             /**
              * @param jNotepad
              * @param charset
              */
-            public CharsetAction(JNotepad jNotepad, Charset charset) {
+            public CharsetAction(JEdit jNotepad, Charset charset) {
                 this.jNotepad = jNotepad;
                 this.charset = charset;
                 putValue(NAME, charset.displayName());

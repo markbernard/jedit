@@ -26,7 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
-import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.JEdit;
 import io.github.markbernard.jedit.dialog.SearchDialog;
 
 /**
@@ -61,14 +61,14 @@ public class DialogAction {
      */
     public static class ReplaceAction extends AbstractAction {
         private static final long serialVersionUID = 4675522254419238324L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
         private SearchDialog searchDialog;
 
         /**
          * @param jNotepad 
          * @param searchDialog 
          */
-        public ReplaceAction(JNotepad jNotepad, SearchDialog searchDialog) {
+        public ReplaceAction(JEdit jNotepad, SearchDialog searchDialog) {
             this.jNotepad = jNotepad;
             this.searchDialog = searchDialog;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
@@ -94,14 +94,14 @@ public class DialogAction {
      */
     public static class ReplaceAllAction extends AbstractAction {
         private static final long serialVersionUID = 4675522254419238324L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
         private SearchDialog searchDialog;
 
         /**
          * @param jNotepad 
          * @param searchDialog 
          */
-        public ReplaceAllAction(JNotepad jNotepad, SearchDialog searchDialog) {
+        public ReplaceAllAction(JEdit jNotepad, SearchDialog searchDialog) {
             this.jNotepad = jNotepad;
             this.searchDialog = searchDialog;
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);

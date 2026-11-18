@@ -59,12 +59,14 @@ import org.apache.jorphan.gui.MenuScroller;
 import io.github.markbernard.jedit.action.DocumentAction;
 import io.github.markbernard.jedit.action.EditAction;
 import io.github.markbernard.jedit.action.FileAction;
+import io.github.markbernard.jedit.action.HelpAction;
+import io.github.markbernard.jedit.dialog.AboutDialog;
 import io.github.markbernard.jedit.dialog.SearchDialog;
 
 /**
  * 
  */
-public class JNotepad implements WindowListener, KeyListener {
+public class JEdit implements WindowListener, KeyListener {
     private static final String APPLICATION_TITLE = "JEdit";
     private static final Object TAB_LOCK = new Object();
 
@@ -95,7 +97,7 @@ public class JNotepad implements WindowListener, KeyListener {
     /**
      * @param parent 
      */
-    public JNotepad(JFrame parent) {
+    public JEdit(JFrame parent) {
         this.parent = parent;
         parent.addWindowListener(this);
         ApplicationPreferences.loadPrefs(parent);
@@ -127,22 +129,22 @@ public class JNotepad implements WindowListener, KeyListener {
         
         JMenu fileMenu = new JMenu(new FileAction());
         bar.add(fileMenu);
-        JMenuItem fileNew = new JMenuItem(new FileAction.NewAction(this));
-        fileMenu.add(fileNew);
-        JMenuItem fileOpen = new JMenuItem(new FileAction.OpenAction(this));
-        fileMenu.add(fileOpen);
-        JMenuItem fileSave = new JMenuItem(new FileAction.SaveAction(this));
-        fileMenu.add(fileSave);
-        JMenuItem fileSaveAs = new JMenuItem(new FileAction.SaveAsAction(this));
-        fileMenu.add(fileSaveAs);
+        JMenuItem fileNewMenuItem = new JMenuItem(new FileAction.NewAction(this));
+        fileMenu.add(fileNewMenuItem);
+        JMenuItem fileOpenMenuItem = new JMenuItem(new FileAction.OpenAction(this));
+        fileMenu.add(fileOpenMenuItem);
+        JMenuItem fileSaveMenuItem = new JMenuItem(new FileAction.SaveAction(this));
+        fileMenu.add(fileSaveMenuItem);
+        JMenuItem fileSaveAsMenuItem = new JMenuItem(new FileAction.SaveAsAction(this));
+        fileMenu.add(fileSaveAsMenuItem);
         fileMenu.addSeparator();
-        JMenuItem filePageSetup = new JMenuItem(new FileAction.PageSetupAction(this));
-        fileMenu.add(filePageSetup);
-        JMenuItem filePrint = new JMenuItem(new FileAction.PrintAction(this));
-        fileMenu.add(filePrint);
+        JMenuItem filePageSetupMenuItem = new JMenuItem(new FileAction.PageSetupAction(this));
+        fileMenu.add(filePageSetupMenuItem);
+        JMenuItem filePrintMenuItem = new JMenuItem(new FileAction.PrintAction(this));
+        fileMenu.add(filePrintMenuItem);
         fileMenu.addSeparator();
-        JMenuItem fileExit = new JMenuItem(new FileAction.ExitAction(this));
-        fileMenu.add(fileExit);
+        JMenuItem fileExitMenuItem = new JMenuItem(new FileAction.ExitAction(this));
+        fileMenu.add(fileExitMenuItem);
         fileRecentDocuments = new JMenu(new FileAction.FileRecentDocumentsAction());
         fileMenu.add(fileRecentDocuments);
         updateRecentDocuments();
@@ -200,6 +202,11 @@ public class JNotepad implements WindowListener, KeyListener {
             JMenuItem charsetMenuItem = new JMenuItem(new DocumentAction.EncodingAction.CharsetAction(this, charset));
             encodingMenu.add(charsetMenuItem);
         }
+
+        JMenu helpMenu = new JMenu(new HelpAction());
+        bar.add(helpMenu);
+        JMenuItem helpAboutMenuItem = new JMenuItem(new HelpAction.AboutAction(this));
+        helpMenu.add(helpAboutMenuItem);
     }
     
     private void updateRecentDocuments() {
@@ -479,7 +486,7 @@ public class JNotepad implements WindowListener, KeyListener {
      * Display a dialog for the user to search the text for something
      */
     public void find() {
-        JNotepad self = this;
+        JEdit self = this;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -505,7 +512,7 @@ public class JNotepad implements WindowListener, KeyListener {
      * 
      */
     public void replace() {
-        JNotepad self = this;
+        JEdit self = this;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -755,6 +762,18 @@ public class JNotepad implements WindowListener, KeyListener {
     }
 
     /**
+     * 
+     */
+    public void about() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                AboutDialog aboutDialog = new AboutDialog(parent);
+                aboutDialog.setVisible(true);
+            }
+        });
+    }
+    /**
      * Exit while saving prefrenecs and checking if save is required.
      */
     public void exit() {
@@ -835,7 +854,7 @@ public class JNotepad implements WindowListener, KeyListener {
         for (String path : fontFiles) {
             try {
                 // Use Font.TRUETYPE_FONT for both .ttf and .otf files
-                Font font = Font.createFont(Font.TRUETYPE_FONT, JNotepad.class.getResourceAsStream(path));
+                Font font = Font.createFont(Font.TRUETYPE_FONT, JEdit.class.getResourceAsStream(path));
                 ge.registerFont(font);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -851,7 +870,7 @@ public class JNotepad implements WindowListener, KeyListener {
         }
         JFrame f = new JFrame("JNotepad");
         f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        new JNotepad(f);
+        new JEdit(f);
         SwingUtilities.invokeLater(() -> f.setVisible(true));
     }
 }

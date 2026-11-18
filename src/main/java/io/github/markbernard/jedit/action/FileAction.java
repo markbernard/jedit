@@ -28,7 +28,7 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import io.github.markbernard.jedit.IconGenerator;
-import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.JEdit;
 
 /**
  * Takes care of all actions for the File menu. Menu actions will be internal classes of this class.
@@ -57,14 +57,14 @@ public class FileAction extends AbstractAction {
      */
     public static class NewAction extends AbstractAction {
         private static final long serialVersionUID = 8935736532927739892L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the New menu item.
          * 
          * @param jNotepad Access to the application to perform actions. 
          */
-        public NewAction(JNotepad jNotepad) {
+        public NewAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
@@ -92,14 +92,14 @@ public class FileAction extends AbstractAction {
      */
     public static class OpenAction extends AbstractAction {
         private static final long serialVersionUID = 3954227951651230619L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Open menu item.
          * 
          * @param jNotepad Access to the application to perform actions. 
          */
-        public OpenAction(JNotepad jNotepad) {
+        public OpenAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
@@ -127,14 +127,14 @@ public class FileAction extends AbstractAction {
      */
     public static class SaveAction extends AbstractAction {
         private static final long serialVersionUID = 980383255637754695L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Save menu item.
          * 
          * @param jNotepad 
          */
-        public SaveAction(JNotepad jNotepad) {
+        public SaveAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
@@ -162,14 +162,14 @@ public class FileAction extends AbstractAction {
      */
     public static class SaveAsAction extends AbstractAction {
         private static final long serialVersionUID = 8295016518814119408L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Save As menu item.
          * 
          * @param jNotepad 
          */
-        public SaveAsAction(JNotepad jNotepad) {
+        public SaveAsAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, 5);
@@ -197,14 +197,14 @@ public class FileAction extends AbstractAction {
      */
     public static class PageSetupAction extends AbstractAction {
         private static final long serialVersionUID = -6577539419280079060L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Page Setup menu item.
          * 
          * @param jNotepad 
          */
-        public PageSetupAction(JNotepad jNotepad) {
+        public PageSetupAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(Action.NAME, "Page Setup...");
@@ -231,14 +231,14 @@ public class FileAction extends AbstractAction {
      */
     public static class PrintAction extends AbstractAction {
         private static final long serialVersionUID = -6449830362022451492L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Print menu item.
          * 
          * @param jNotepad 
          */
-        public PrintAction(JNotepad jNotepad) {
+        public PrintAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
@@ -266,14 +266,14 @@ public class FileAction extends AbstractAction {
      */
     public static class ExitAction extends AbstractAction {
         private static final long serialVersionUID = -3795345737189627905L;
-        private JNotepad jNotepad;
+        private JEdit jNotepad;
 
         /**
          * Set up values appropriate to the Exit menu item.
          * 
          * @param jNotepad Access to the application to perform actions. 
          */
-        public ExitAction(JNotepad jNotepad) {
+        public ExitAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
             putValue(Action.NAME, "Exit");
@@ -321,7 +321,7 @@ public class FileAction extends AbstractAction {
             private static final long serialVersionUID = -8560848798824824961L;
 
             private String filePath;
-            private JNotepad jNotepad;
+            private JEdit jNotepad;
 
             /**
              * Set up values appropriate to the selected document menu item.
@@ -330,7 +330,7 @@ public class FileAction extends AbstractAction {
              * @param filePath
              * @param jNotepad
              */
-            public FileRecentDocumentsOpenDocumentAction(int item, String filePath, JNotepad jNotepad) {
+            public FileRecentDocumentsOpenDocumentAction(int item, String filePath, JEdit jNotepad) {
                 this.filePath = filePath;
                 this.jNotepad = jNotepad;
                 if (item != -1) {
