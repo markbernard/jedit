@@ -1,6 +1,6 @@
 /**
  * The MIT License (MIT)
- * Copyright (c) 2016 Mark Bernard
+ * Copyright (c) 2026 Mark Bernard
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of 
  * this software and associated documentation files (the "Software"), to deal in the 
@@ -17,7 +17,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package jedit.dialog;
+package io.github.markbernard.jedit.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -34,7 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.PlainDocument;
 
-import jedit.JNotepad;
+import io.github.markbernard.jedit.JNotepad;
 
 /**
  * @author Mark Bernard

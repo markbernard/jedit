@@ -1,6 +1,6 @@
 /**
  * The MIT License (MIT)
- * Copyright (c) 2016 Mark Bernard
+ * Copyright (c) 2026 Mark Bernard
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of 
  * this software and associated documentation files (the "Software"), to deal in the 
@@ -17,7 +17,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package jedit;
+package io.github.markbernard.jedit;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -47,7 +47,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
@@ -79,8 +78,8 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.RUndoManager;
 import org.fife.ui.rtextarea.TextMode;
 
-import jedit.dialog.EncodingDialog;
-import jedit.dialog.GoToDialog;
+import io.github.markbernard.jedit.dialog.EncodingDialog;
+import io.github.markbernard.jedit.dialog.GoToDialog;
 
 /**
  * @author Mark Bernard
@@ -92,19 +91,6 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private static final String[] NEW_LINE_CHAR = {"\n", "\r\n"};
 //    private static final String[] REGEX_NEW_LINE_CHAR = {"\\n", "\\r\\n"};
 
-    //Lists of extensions for each comment type
-    private static final Set<String> cComment = new TreeSet<>();
-    
-    static {
-        cComment.add("c");
-        cComment.add("cpp");
-        cComment.add("cs");
-        cComment.add("java");
-        cComment.add("js");
-        cComment.add("php");
-        cComment.add("scala");
-        cComment.add("ts");
-    }
     
     private JNotepad jNotepad;
     private RSyntaxTextArea syntaxTextArea;
@@ -166,36 +152,10 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         syntaxTextArea.addKeyListener(jNotepad);
         syntaxTextArea.addKeyListener(this);
         undoManager = syntaxTextArea.getUndoManager();
-//        syntaxTextArea.getDocument().addUndoableEditListener(undoManager);
         syntaxTextArea.setFont(ApplicationPreferences.getCurrentFont());
         removeKeyStrokes(syntaxTextArea);
         syntaxTextArea.getDocument().addDocumentListener(this);
         updateStatusBar(syntaxTextArea.getCaretPosition());
-        
-//        textPane = new JTextPane() {
-//            private static final long serialVersionUID = 5313646324700091181L;
-//
-//            @Override
-//            public boolean getScrollableTracksViewportWidth() {
-//                //word wrap solution from https://tips4java.wordpress.com/2009/01/25/no-wrap-text-pane/
-//                return (!ApplicationPreferences.isWordWrap() || getUI().getPreferredSize(this).width <= getParent().getSize().width);
-//            }
-//        };
-//        textScroll = new JScrollPane(textPane);
-//        add(textScroll, BorderLayout.CENTER);
-//        textPane.addCaretListener(new CaretListener() {
-//            @Override
-//            public void caretUpdate(CaretEvent e) {
-//                updateStatusBar(e.getDot());
-//            }
-//        });
-//        updateStatusBar(textPane.getCaretPosition());
-//        textPane.addKeyListener(jNotepad);
-//        textPane.addKeyListener(this);
-//        undoManager = new UndoManager();
-//        textPane.getDocument().addUndoableEditListener(undoManager);
-//        textPane.setFont(ApplicationPreferences.getCurrentFont());
-//        removeKeyStrokes(textPane);
     }
     
     /**
@@ -606,6 +566,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         targetMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         targetMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
         targetMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        targetMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, InputEvent.CTRL_DOWN_MASK));
         targetMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
     }
     

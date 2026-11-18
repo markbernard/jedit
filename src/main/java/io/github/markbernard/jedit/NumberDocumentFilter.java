@@ -1,6 +1,6 @@
 /**
  * The MIT License (MIT)
- * Copyright (c) 2016 Mark Bernard
+ * Copyright (c) 2026 Mark Bernard
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of 
  * this software and associated documentation files (the "Software"), to deal in the 
@@ -17,45 +17,37 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package jedit;
+package io.github.markbernard.jedit;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 /**
  * @author Mark Bernard
  */
-public class IconGenerator {
-    private static final Map<String, Icon> iconCache = new HashMap<String, Icon>();
-    private String path;
-
-    /**
-     * @param path Path to the resource
-     */
-    public IconGenerator(String path) {
-        this.path = path;
-    }
+public class NumberDocumentFilter extends DocumentFilter {
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("^\\d+$");
     
-    /**
-     * @return The image pointed to by the provided path
-     */
-    public Icon loadImage() {
-        Icon icon = iconCache.get(path);
-        
-        if (icon == null) {
-            try {
-                icon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream(path)));
-                iconCache.put(path, icon);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    @Override
+    public void insertString(FilterBypass fb, int offset, 
+            String string, AttributeSet attr) throws BadLocationException {
+        if (containsOnlyNumeric(string)) {
+            fb.insertString(offset, string, attr);
         }
-        
-        return icon;
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, 
+            String text, AttributeSet attrs) throws BadLocationException {
+        if (containsOnlyNumeric(text)) {
+            fb.replace(offset, length, text, attrs);
+        }
+    }
+
+    private boolean containsOnlyNumeric(String text) {
+        return NUMBER_PATTERN.matcher(text).find();
     }
 }

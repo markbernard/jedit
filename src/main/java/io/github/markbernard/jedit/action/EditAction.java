@@ -1,6 +1,6 @@
 /**
  * The MIT License (MIT)
- * Copyright (c) 2016 Mark Bernard
+ * Copyright (c) 2026 Mark Bernard
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of 
  * this software and associated documentation files (the "Software"), to deal in the 
@@ -17,7 +17,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package jedit.action;
+package io.github.markbernard.jedit.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -29,9 +29,9 @@ import javax.swing.SwingUtilities;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 
-import jedit.IconGenerator;
-import jedit.JNotepad;
-import jedit.dialog.SearchDialog;
+import io.github.markbernard.jedit.IconGenerator;
+import io.github.markbernard.jedit.JNotepad;
+import io.github.markbernard.jedit.dialog.SearchDialog;
 
 /**
  * Takes care of all actions for the Edit menu. Menu items will be internal classes of this class.
