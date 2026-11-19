@@ -1,0 +1,60 @@
+/**
+ * 
+ */
+package io.github.markbernard.jedit;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+
+/**
+ * 
+ */
+public class Translations {
+    private static ResourceBundle bundle = null;
+    
+    /**
+     * @param key
+     * @return the language string for the given key
+     */
+    public static String getString(String key) {
+        return getString(key, (String[]) null);
+    }
+
+    /**
+     * @param key
+     * @param params
+     * @return the language string for the given key, inserting parameters where needed
+     */
+    public static String getString(String key,  String... params) {
+        String result = key;
+        
+        if (bundle == null) {
+            try {
+                Locale locale = Locale.getDefault();
+                InputStream stream =  Translations.class.getResourceAsStream("/text/jedit_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
+                if (stream == null) {
+                    stream =  Translations.class.getResourceAsStream("/text/jedit_" + locale.getLanguage() + ".properties");
+                    if (stream == null) {
+                        stream = Translations.class.getResourceAsStream("/text/jedit.properties");
+                    }
+                }
+                bundle = new PropertyResourceBundle(stream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        result = bundle.getString(key);
+        
+        if (params != null) {
+            for (int i=0;i<params.length;i++) {
+                result = result.replaceAll("\\$\\{" + i + "\\}", params[i]);
+            }
+        }
+        
+        return result;
+    }
+}

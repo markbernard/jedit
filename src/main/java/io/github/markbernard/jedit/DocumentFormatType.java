@@ -83,7 +83,7 @@ public class DocumentFormatType {
      * @return the format type
      */
     public static LanguageInfo determineFormatFromFile(String filePath) {
-        LanguageInfo result = new LanguageInfo("None", SyntaxConstants.SYNTAX_STYLE_NONE, "");
+        LanguageInfo result = new LanguageInfo(SyntaxConstants.SYNTAX_STYLE_NONE, "None", "");
         
         int index = filePath.lastIndexOf(".");
         if (index > -1) {

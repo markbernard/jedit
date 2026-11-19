@@ -27,6 +27,7 @@ import javax.swing.Action;
 
 import io.github.markbernard.jedit.IconGenerator;
 import io.github.markbernard.jedit.JEdit;
+import io.github.markbernard.jedit.Translations;
 
 /**
  * @author Mark Bernard
@@ -38,7 +39,7 @@ public class HelpAction extends AbstractAction {
      * 
      */
     public HelpAction() {
-        putValue(NAME, "Help");
+        putValue(NAME, Translations.getString("HelpAction.constuctor.help"));
         putValue(MNEMONIC_KEY, KeyEvent.VK_H);
     }
 
@@ -58,9 +59,9 @@ public class HelpAction extends AbstractAction {
          */
         public ViewHelpAction(JEdit jEdit) {
             this.jEdit = jEdit;
-            putValue(NAME, "View Help");
-            putValue(MNEMONIC_KEY, KeyEvent.VK_H);
-            putValue(Action.SHORT_DESCRIPTION, "Open help pages.");
+            putValue(NAME, Translations.getString("HelpAction.ViewHelpAction.constuctor.viewhelp"));
+            putValue(MNEMONIC_KEY, KeyEvent.VK_V);
+            putValue(Action.SHORT_DESCRIPTION, Translations.getString("HelpAction.ViewHelpAction.constuctor.open"));
             putValue(Action.SMALL_ICON, new IconGenerator("/icons/HelpSmall.png").loadImage());
             putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Help.png").loadImage());
         }
@@ -72,7 +73,7 @@ public class HelpAction extends AbstractAction {
                 public void run() {
 //                    jEdit.help();
                 }
-            }, "View Help").start();
+            }, Translations.getString("HelpAction.ViewHelpAction.constuctor.viewhelp")).start();
         }
     }
 
@@ -89,7 +90,7 @@ public class HelpAction extends AbstractAction {
          */
         public AboutAction(JEdit jEdit) {
             this.jEdit = jEdit;
-            putValue(NAME, "About");
+            putValue(NAME, Translations.getString("HelpAction.AboutAction.constuctor.about"));
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(Action.SMALL_ICON, new IconGenerator("/icons/AboutSmall.png").loadImage());
             putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/About.png").loadImage());
@@ -102,7 +103,7 @@ public class HelpAction extends AbstractAction {
                 public void run() {
                     jEdit.about();
                 }
-            }, "About").start();
+            }, Translations.getString("HelpAction.AboutAction.constuctor.about")).start();
         }
     }
 }

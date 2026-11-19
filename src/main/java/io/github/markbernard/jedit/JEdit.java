@@ -48,6 +48,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
@@ -104,6 +105,7 @@ public class JEdit implements WindowListener, KeyListener {
         editorPanel = new JPanel(new BorderLayout());
         parent.add(editorPanel, BorderLayout.CENTER);
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setOpaque(false);
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -119,8 +121,32 @@ public class JEdit implements WindowListener, KeyListener {
         editorPanel.add(tabbedPane, BorderLayout.CENTER);
         newDocumentCounter = 1;
         createMenus();
+        createToolBar();
         createStatusBar();
         newDocument();
+    }
+    
+    private void createToolBar() {
+        JToolBar toolbar = new JToolBar();
+        editorPanel.add(toolbar, BorderLayout.NORTH);
+        toolbar.add(new FileAction.NewAction(this));
+        toolbar.add(new FileAction.OpenAction(this));
+        toolbar.add(new FileAction.SaveAction(this));
+
+        toolbar.addSeparator();
+        toolbar.add(new FileAction.ExitAction(this));
+        
+        toolbar.addSeparator();
+        toolbar.add(new EditAction.CutAction(this));
+        toolbar.add(new EditAction.CopyAction(this));
+        toolbar.add(new EditAction.PasteAction(this));
+
+        toolbar.addSeparator();
+        toolbar.add(new EditAction.FindAction(this));
+        toolbar.add(new EditAction.ReplaceAction(this));
+
+        toolbar.addSeparator();
+        toolbar.add(new HelpAction.ViewHelpAction(this));
     }
 
     private void createMenus() {
@@ -224,13 +250,14 @@ public class JEdit implements WindowListener, KeyListener {
             }
             fileRecentDocuments.validate();
         } else {
-            JMenuItem emptyItem = new JMenuItem("(empty)");
+            JMenuItem emptyItem = new JMenuItem("(" + Translations.getString("JEdit.updateRecentDocuments.empty") + ")");
             fileRecentDocuments.add(emptyItem);
             emptyItem.setEnabled(false);
         }
     }
     
     private void createStatusBar() {
+        Font statusBarFont = new Font("Consolas", Font.PLAIN, 14);
         JPanel mainStatusBarPanel = new JPanel(new BorderLayout(0, 0));
         setStausBorder(mainStatusBarPanel);
         JPanel statusBarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -238,51 +265,51 @@ public class JEdit implements WindowListener, KeyListener {
         JPanel positionPanel = new JPanel(new BorderLayout());
         statusBarPanel.add(positionPanel);
         setStausBorder(positionPanel);
-        positionLabel = new JLabel("0, 0");
+        positionLabel = new JLabel("");
         positionPanel.add(positionLabel, BorderLayout.WEST);
-        positionLabel.setFont(new Font("Consolas", Font.PLAIN, 14));
+        positionLabel.setFont(statusBarFont);
         
         JPanel capsLockPanel = new JPanel(new BorderLayout());
         statusBarPanel.add(capsLockPanel);
         setStausBorder(capsLockPanel);
-        capsLockLabel = new JLabel("CAPS OFF");
+        capsLockLabel = new JLabel("");
         capsLockPanel.add(capsLockLabel, BorderLayout.WEST);
-        capsLockLabel.setFont(new Font("Consolas", Font.PLAIN, 14));
+        capsLockLabel.setFont(statusBarFont);
         
         JPanel insertPanel = new JPanel(new BorderLayout());
         statusBarPanel.add(insertPanel);
         setStausBorder(insertPanel);
-        insertLabel = new JLabel("INS");
+        insertLabel = new JLabel("");
         insertPanel.add(insertLabel, BorderLayout.WEST);
-        insertLabel.setFont(new Font("Consolas", Font.PLAIN, 14));
+        insertLabel.setFont(statusBarFont);
         
         JPanel readOnlyPanel = new JPanel(new BorderLayout());
         statusBarPanel.add(readOnlyPanel);
         setStausBorder(readOnlyPanel);
-        readOnlyLabel = new JLabel("Read/Write");
+        readOnlyLabel = new JLabel("");
         readOnlyPanel.add(readOnlyLabel, BorderLayout.WEST);
-        readOnlyLabel.setFont(new Font("Consolas", Font.PLAIN, 14));
+        readOnlyLabel.setFont(statusBarFont);
         
         JPanel encodingPanel = new JPanel(new BorderLayout());
         statusBarPanel.add(encodingPanel);
         setStausBorder(encodingPanel);
-        encodingLabel = new JLabel("UTF-8");
+        encodingLabel = new JLabel("");
         encodingPanel.add(encodingLabel, BorderLayout.WEST);
-        encodingLabel.setFont(new Font("Consolas", Font.PLAIN, 14));
+        encodingLabel.setFont(statusBarFont);
 
         JPanel languagePanel = new JPanel(new BorderLayout());
         statusBarPanel.add(languagePanel);
         setStausBorder(languagePanel);
-        languageLabel = new JLabel("None");
+        languageLabel = new JLabel("");
         languagePanel.add(languageLabel, BorderLayout.WEST);
-        languageLabel.setFont(new Font("Consolas", Font.PLAIN, 14));
+        languageLabel.setFont(statusBarFont);
 
         JPanel filePathPanel = new JPanel(new BorderLayout());
         mainStatusBarPanel.add(filePathPanel, BorderLayout.CENTER);
         setStausBorder(filePathPanel);
-        filePathLabel = new JLabel("new 1");
+        filePathLabel = new JLabel("");
         filePathPanel.add(filePathLabel, BorderLayout.WEST);
-        filePathLabel.setFont(new Font("Consolas", Font.PLAIN, 12));
+        filePathLabel.setFont(statusBarFont);
 
         //        if (ApplicationPreferences.isStatusBar()) {
             editorPanel.add(mainStatusBarPanel, BorderLayout.SOUTH);
@@ -302,16 +329,18 @@ public class JEdit implements WindowListener, KeyListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                editUndoMenuItem.setEnabled(currentDocument.canUndo());
-                editRedoMenuItem.setEnabled(currentDocument.canRedo());
-                insertMode = currentDocument.isInsertMode();
-                updateCursorLocation(position);
-                updateCapsLock();
-                updateInsertMode();
-                updateReadOnly();
-                updateEncoding();
-                updateLanguage();
-                updateFilePath();
+                if (currentDocument != null) {
+                    editUndoMenuItem.setEnabled(currentDocument.canUndo());
+                    editRedoMenuItem.setEnabled(currentDocument.canRedo());
+                    insertMode = currentDocument.isInsertMode();
+                    updateCursorLocation(position);
+                    updateCapsLock();
+                    updateInsertMode();
+                    updateReadOnly();
+                    updateEncoding();
+                    updateLanguage();
+                    updateFilePath();
+                }
             }
         });
     }
@@ -323,10 +352,10 @@ public class JEdit implements WindowListener, KeyListener {
     private void updateCapsLock() {
         if (Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK)) {
             capsLockLabel.setForeground(Color.BLACK);
-            capsLockLabel.setText("CAPS ON ");
+            capsLockLabel.setText(Translations.getString("JEdit.updateCapsLock.capson"));
         } else {
             capsLockLabel.setForeground(Color.LIGHT_GRAY);
-            capsLockLabel.setText("CAPS OFF");
+            capsLockLabel.setText(Translations.getString("JEdit.updateCapsLock.capsoff"));
         }
     }
     
@@ -334,20 +363,20 @@ public class JEdit implements WindowListener, KeyListener {
         currentDocument.setInsertMode(insertMode);
         if (insertMode) {
             insertLabel.setForeground(Color.LIGHT_GRAY);
-            insertLabel.setText("INS");
+            insertLabel.setText(Translations.getString("JEdit.updateInsertMode.ins"));
         } else {
             insertLabel.setForeground(Color.BLACK);
-            insertLabel.setText("OVR");
+            insertLabel.setText(Translations.getString("JEdit.updateInsertMode.ovr"));
         }
     }
 
     private void updateReadOnly() {
         if (readOnly) {
             readOnlyLabel.setForeground(Color.BLACK);
-            readOnlyLabel.setText("Read Only ");
+            readOnlyLabel.setText(Translations.getString("JEdit.updateReadOnly.readonly"));
         } else {
             readOnlyLabel.setForeground(Color.LIGHT_GRAY);
-            readOnlyLabel.setText("Read/Write");
+            readOnlyLabel.setText(Translations.getString("JEdit.updateReadOnly.readwrite"));
         }
     }
     
@@ -868,7 +897,7 @@ public class JEdit implements WindowListener, KeyListener {
         } catch (Exception e) {
             // System look and feel is always present.
         }
-        JFrame f = new JFrame("JNotepad");
+        JFrame f = new JFrame("JEdit");
         f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         new JEdit(f);
         SwingUtilities.invokeLater(() -> f.setVisible(true));

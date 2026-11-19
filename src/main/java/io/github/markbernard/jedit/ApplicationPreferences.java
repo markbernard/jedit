@@ -20,6 +20,7 @@
 package io.github.markbernard.jedit;
 
 import java.awt.Font;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -45,12 +46,29 @@ public class ApplicationPreferences {
     private static final String FONT_SIZE = "font.size";
     private static final String RECENT_DOCUMENTS = "recent.documents";
     
+    private static File preferencesPath;
     private static String currentFileName = "Untitled";
     private static String currentFilePath;
     private static boolean wordWrap;
     private static boolean statusBar;
     private static Font currentFont;
     private static List<String> recentDocuments = new ArrayList<>();
+    
+    static {
+        String os = System.getProperty("os.name", "Linux");
+        if (os.toLowerCase().contains("mac")) {
+            preferencesPath = new File(System.getProperty("user.home") + "/Library/Preferences/jedit");
+        } else if (os.toLowerCase().contains("windows")) {
+            preferencesPath = new File(System.getenv("localappdata") + "/jedit");
+        } else {
+            //Default to Linux
+            preferencesPath = new File(System.getProperty("user.home") + "/.jedit");
+        }
+        
+        if (!preferencesPath.exists()) {
+            preferencesPath.mkdirs();
+        }
+    }
     
     /**
      * Load state from the user preferences store and apply that state to 

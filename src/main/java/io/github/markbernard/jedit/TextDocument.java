@@ -118,6 +118,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         fileName = newFileName;
         charset = StandardCharsets.UTF_8;
         createGui();
+        setLanguageInfo(DocumentFormatType.determineFormatFromFile(""));
     }
 
     /**
