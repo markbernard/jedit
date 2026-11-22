@@ -20,6 +20,8 @@
 package io.github.markbernard.jedit;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -30,6 +32,8 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Mark Bernard
@@ -68,26 +72,34 @@ public class TabComponent extends JPanel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        simpleIcon.setHover(true);
-        simpleIcon.repaint();
+        if (e.getComponent().equals(simpleIcon)) {
+            simpleIcon.setHover(true);
+            simpleIcon.repaint();
+        }
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        simpleIcon.setHover(false);
-        simpleIcon.repaint();
+        if (e.getComponent().equals(simpleIcon)) {
+            simpleIcon.setHover(false);
+            simpleIcon.repaint();
+        }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        simpleIcon.setPressed(true);
-        simpleIcon.repaint();
+        if (e.getComponent().equals(simpleIcon)) {
+            simpleIcon.setPressed(true);
+            simpleIcon.repaint();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        simpleIcon.setPressed(false);
-        simpleIcon.repaint();
+        if (e.getComponent().equals(simpleIcon)) {
+            simpleIcon.setPressed(false);
+            simpleIcon.repaint();
+        }
     }
 
     class SimpleIcon extends JComponent {

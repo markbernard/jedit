@@ -23,51 +23,146 @@ import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 
 /**
  * Class to save and load application state between executions.
  * 
  * @author Mark Bernard
  */
+@Root
 public class ApplicationPreferences {
-    private static final String WINDOW_X = "window.x";
-    private static final String WINDOW_Y = "window.y";
-    private static final String WINDOW_WIDTH = "window.width";
-    private static final String WINDOW_HEIGHT = "window.height";
-    private static final String WINDOW_MAXIMIZED = "window.maximized";
-    private static final String LAST_FILE_PATH = "last.file.path";
-    private static final String WORD_WRAP = "word.wrap";
-    private static final String STATUS_BAR = "status.bar";
-    private static final String FONT_FAMILY = "font.family";
-    private static final String FONT_STYLE = "font.style";
-    private static final String FONT_SIZE = "font.size";
-    private static final String RECENT_DOCUMENTS = "recent.documents";
+    private static final String CONFIG_FILE_NAME = "jedit_config.xml";
     
-    private static File preferencesPath;
-    private static String currentFileName = "Untitled";
-    private static String currentFilePath;
-    private static boolean wordWrap;
-    private static boolean statusBar;
-    private static Font currentFont;
-    private static List<String> recentDocuments = new ArrayList<>();
+    private static ApplicationPreferences instance;
     
-    static {
-        String os = System.getProperty("os.name", "Linux");
-        if (os.toLowerCase().contains("mac")) {
-            preferencesPath = new File(System.getProperty("user.home") + "/Library/Preferences/jedit");
-        } else if (os.toLowerCase().contains("windows")) {
-            preferencesPath = new File(System.getenv("localappdata") + "/jedit");
-        } else {
-            //Default to Linux
-            preferencesPath = new File(System.getProperty("user.home") + "/.jedit");
+    private File configurationPath;
+
+    @Element(required = false)
+    private int windowX;
+    @Element(required = false)
+    private int windowY;
+    @Element(required = false)
+    private int windowWidth;
+    @Element(required = false)
+    private int windowHeight;
+    @Element(required = false)
+    private boolean windowMaximized;
+    @Element(required = false)
+    private String currentFileName;
+    @Element(required = false)
+    private String currentFilePath;
+    @Element(required = false)
+    private boolean wordWrap;
+    @Element(required = false)
+    private boolean statusBar;
+    @Element(required = false)
+    private String currentFontName;
+    @Element(required = false)
+    private int currentFontStyle;
+    @Element(required = false)
+    private int currentFontSize;
+    private Font currentFont;
+    @ElementList(name = "recentDocuments", entry = "document", required = false)
+    private List<String> recentDocuments = new ArrayList<>();
+    @Element(required = false)
+    private int themeDialogX;
+    @Element(required = false)
+    private int themeDialogY;
+    @Element(required = false)
+    private int themeDialogWidth;
+    @Element(required = false)
+    private int themeDialogHeight;
+    @Element(required = false)
+    private int themeDialogMainDividerLocation;
+    @Element(required = false)
+    private int themeDialogStyleDividerLocation;
+    
+    /**
+     * @return The one instance
+     */
+    public static ApplicationPreferences getInstance() {
+        if (instance == null) {
+            instance = new ApplicationPreferences();
         }
         
-        if (!preferencesPath.exists()) {
-            preferencesPath.mkdirs();
+        return instance;
+    }
+    
+    private ApplicationPreferences() {
+        String os = System.getProperty("os.name", "Linux");
+        if (os.toLowerCase().contains("mac")) {
+            configurationPath = new File(System.getProperty("user.home") + "/Library/Preferences/jedit");
+        } else if (os.toLowerCase().contains("windows")) {
+            configurationPath = new File(System.getenv("localappdata") + "/jedit");
+        } else {
+            //Default to Linux
+            String configPath = System.getenv("XDG_CONFIG_HOME");
+            if (configPath == null) {
+                configPath = System.getProperty("user.home") + "/.config";
+            }
+            configurationPath = new File(configPath + "/jedit");
         }
+        
+        if (!configurationPath.exists()) {
+            configurationPath.mkdirs();
+        }
+        
+        setDefaults();
+    }
+    
+    private void setDefaults() {
+        windowX = 0;
+        windowY = 0;
+        windowWidth = 1024;
+        windowHeight = 768;
+        windowMaximized = false;
+        currentFileName = "Untitled";
+        currentFilePath = System.getProperty("user.home");
+        wordWrap = false;
+        statusBar = true;
+        currentFontName = "Hack";
+        currentFontStyle = Font.PLAIN;
+        currentFontSize = 16;
+        currentFont = new Font(currentFontName, currentFontStyle, currentFontSize);
+        recentDocuments = new ArrayList<>();
+        themeDialogX = 0;
+        themeDialogY = 0;
+        themeDialogWidth = 1024;
+        themeDialogHeight = 768;
+        themeDialogMainDividerLocation = 120;
+        themeDialogStyleDividerLocation = 425;
+    }
+    
+    private void copy(ApplicationPreferences copyFrom) {
+        windowX = copyFrom.windowX;
+        windowY = copyFrom.windowY;
+        windowWidth = copyFrom.windowWidth;
+        windowHeight = copyFrom.windowHeight;
+        windowMaximized = copyFrom.windowMaximized;
+        currentFileName = copyFrom.currentFileName;
+        currentFilePath = copyFrom.currentFilePath;
+        wordWrap = copyFrom.wordWrap;
+        statusBar = copyFrom.statusBar;
+        currentFontName = copyFrom.currentFontName;
+        currentFontStyle = copyFrom.currentFontStyle;
+        currentFontSize = copyFrom.currentFontSize;
+        currentFont = new Font(currentFontName, currentFontStyle, currentFontSize);
+        recentDocuments = copyFrom.recentDocuments;
+        themeDialogX = copyFrom.themeDialogX;
+        themeDialogY = copyFrom.themeDialogY;
+        themeDialogWidth = copyFrom.themeDialogWidth;
+        themeDialogHeight = copyFrom.themeDialogHeight;
+        themeDialogMainDividerLocation = copyFrom.themeDialogMainDividerLocation;
+        themeDialogStyleDividerLocation = copyFrom.themeDialogStyleDividerLocation;
     }
     
     /**
@@ -76,26 +171,21 @@ public class ApplicationPreferences {
      * 
      * @param frame The application window.
      */
-    public static void loadPrefs(JFrame frame) {
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationPreferences.class);
-        
-        frame.setBounds(prefs.getInt(WINDOW_X, 0),
-                prefs.getInt(WINDOW_Y, 0),
-                prefs.getInt(WINDOW_WIDTH, 800),
-                prefs.getInt(WINDOW_HEIGHT, 600));
-        if (prefs.getBoolean(WINDOW_MAXIMIZED, false)) {
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
-        currentFilePath = prefs.get(LAST_FILE_PATH, System.getProperty("user.home"));
-        wordWrap = prefs.getBoolean(WORD_WRAP, false);
-        statusBar = prefs.getBoolean(STATUS_BAR, true);
-        currentFont = new Font(prefs.get(FONT_FAMILY, "Hack"), prefs.getInt(FONT_STYLE, Font.PLAIN), prefs.getInt(FONT_SIZE, 16));
-        for (int i=0;i<9;i++) {
-            String document = prefs.get(i + RECENT_DOCUMENTS, null);
-            if (document != null) {
-                recentDocuments.add(document);
-            } else {
-                break;
+    public void loadPrefs(JFrame frame) {
+        if (configurationPath.exists()) {
+            try {
+                File configFile = new File(configurationPath.getAbsolutePath() + "/" + CONFIG_FILE_NAME);
+                if (configFile.exists()) {
+                    Serializer serializer = new Persister();
+                    ApplicationPreferences temp = serializer.read(ApplicationPreferences.class, configFile);
+                    copy(temp);
+                }
+                frame.setBounds(windowX, windowY, windowWidth, windowHeight);
+                if (windowMaximized) {
+                    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -106,114 +196,241 @@ public class ApplicationPreferences {
      * 
      * @param frame The main application window.
      */
-    public static void savePrefs(JFrame frame) {
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationPreferences.class);
-        
-        if (frame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-            prefs.putBoolean(WINDOW_MAXIMIZED, true);
-        } else {
-            prefs.putBoolean(WINDOW_MAXIMIZED, false);
-            prefs.putInt(WINDOW_X, frame.getX());
-            prefs.putInt(WINDOW_Y, frame.getY());
-            prefs.putInt(WINDOW_WIDTH, frame.getWidth());
-            prefs.putInt(WINDOW_HEIGHT, frame.getHeight());
+    public void savePrefs(JFrame frame) {
+        if (configurationPath.exists()) {
+            try {
+                windowMaximized = frame.getExtendedState() == JFrame.MAXIMIZED_BOTH;
+                if (!windowMaximized) {
+                    windowX = frame.getX();
+                    windowY = frame.getY();
+                    windowWidth = frame.getWidth();
+                    windowHeight = frame.getHeight();
+                }
+                Serializer serializer = new Persister();
+                serializer.write(this, new File(configurationPath.getAbsolutePath() + "/" + CONFIG_FILE_NAME));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        prefs.put(LAST_FILE_PATH, currentFilePath);
-        prefs.putBoolean(WORD_WRAP, wordWrap);
-        prefs.putBoolean(STATUS_BAR, statusBar);
-        prefs.put(FONT_FAMILY, currentFont.getFamily());
-        prefs.putInt(FONT_STYLE, currentFont.getStyle());
-        prefs.putInt(FONT_SIZE, currentFont.getSize());
-        for (int i=0;i<recentDocuments.size();i++) {
-            prefs.put(i + RECENT_DOCUMENTS, recentDocuments.get(i));
-        }
+    }
+
+    /**
+     * @return the windowX
+     */
+    public int getWindowX() {
+        return windowX;
+    }
+
+    /**
+     * @param windowX the windowX to set
+     */
+    public void setWindowX(int windowX) {
+        this.windowX = windowX;
+    }
+
+    /**
+     * @return the windowY
+     */
+    public int getWindowY() {
+        return windowY;
+    }
+
+    /**
+     * @param windowY the windowY to set
+     */
+    public void setWindowY(int windowY) {
+        this.windowY = windowY;
+    }
+
+    /**
+     * @return the windowWidth
+     */
+    public int getWindowWidth() {
+        return windowWidth;
+    }
+
+    /**
+     * @param windowWidth the windowWidth to set
+     */
+    public void setWindowWidth(int windowWidth) {
+        this.windowWidth = windowWidth;
+    }
+
+    /**
+     * @return the windowHeight
+     */
+    public int getWindowHeight() {
+        return windowHeight;
+    }
+
+    /**
+     * @param windowHeight the windowHeight to set
+     */
+    public void setWindowHeight(int windowHeight) {
+        this.windowHeight = windowHeight;
+    }
+
+    /**
+     * @return the windowMaximized
+     */
+    public boolean isWindowMaximized() {
+        return windowMaximized;
+    }
+
+    /**
+     * @param windowMaximized the windowMaximized to set
+     */
+    public void setWindowMaximized(boolean windowMaximized) {
+        this.windowMaximized = windowMaximized;
     }
 
     /**
      * @return the currentFileName
      */
-    public static String getCurrentFileName() {
+    public String getCurrentFileName() {
         return currentFileName;
     }
 
     /**
      * @param currentFileName the currentFileName to set
      */
-    public static void setCurrentFileName(String currentFileName) {
-        ApplicationPreferences.currentFileName = currentFileName;
+    public void setCurrentFileName(String currentFileName) {
+        this.currentFileName = currentFileName;
     }
 
     /**
      * @return the currentFilePath
      */
-    public static String getCurrentFilePath() {
+    public String getCurrentFilePath() {
         return currentFilePath;
     }
 
     /**
      * @param currentFilePath the currentFilePath to set
      */
-    public static void setCurrentFilePath(String currentFilePath) {
-        ApplicationPreferences.currentFilePath = currentFilePath;
+    public void setCurrentFilePath(String currentFilePath) {
+        this.currentFilePath = currentFilePath;
     }
 
     /**
      * @return the wordWrap
      */
-    public static boolean isWordWrap() {
+    public boolean isWordWrap() {
         return wordWrap;
     }
 
     /**
      * @param wordWrap the wordWrap to set
      */
-    public static void setWordWrap(boolean wordWrap) {
-        ApplicationPreferences.wordWrap = wordWrap;
+    public void setWordWrap(boolean wordWrap) {
+        this.wordWrap = wordWrap;
     }
 
     /**
      * @return the statusBar
      */
-    public static boolean isStatusBar() {
+    public boolean isStatusBar() {
         return statusBar;
     }
 
     /**
      * @param statusBar the statusBar to set
      */
-    public static void setStatusBar(boolean statusBar) {
-        ApplicationPreferences.statusBar = statusBar;
+    public void setStatusBar(boolean statusBar) {
+        this.statusBar = statusBar;
     }
 
     /**
      * @return the currentFont
      */
-    public static Font getCurrentFont() {
+    public Font getCurrentFont() {
+        if (currentFont == null) {
+            currentFont = new Font(currentFontName, currentFontStyle, currentFontSize);
+        }
+        
         return currentFont;
     }
 
     /**
      * @param currentFont the currentFont to set
      */
-    public static void setCurrentFont(Font currentFont) {
-        ApplicationPreferences.currentFont = currentFont;
-    }
-    
-    /**
-     * @param document
-     */
-    public static void addDocument(String document) {
-        recentDocuments.remove(document);
-        recentDocuments.add(0, document);
-        while (recentDocuments.size() > 9) {
-            recentDocuments.remove(9);
-        }
+    public void setCurrentFont(Font currentFont) {
+        this.currentFontName = currentFont.getFontName();
+        this.currentFontStyle = currentFont.getStyle();
+        this.currentFontSize = currentFont.getSize();
     }
 
     /**
      * @return the recentDocuments
      */
-    public static List<String> getRecentDocuments() {
-        return new ArrayList<>(recentDocuments);
+    public List<String> getRecentDocuments() {
+        return recentDocuments;
+    }
+
+    /**
+     * @param recentDocuments the recentDocuments to set
+     */
+    public void setRecentDocuments(List<String> recentDocuments) {
+        this.recentDocuments = recentDocuments;
+    }
+    
+    /**
+     * @param document
+     */
+    public void addDocument(String document) {
+        recentDocuments.remove(document);
+        recentDocuments.add(0, document);
+    }
+
+    /**
+     * @return the configurationPath
+     */
+    public File getConfigurationPath() {
+        return configurationPath;
+    }
+    
+    /**
+     * @param dialog
+     */
+    public void setThemeDialogLocation(JDialog dialog) {
+        themeDialogX = dialog.getX();
+        themeDialogY = dialog.getY();
+        themeDialogWidth = dialog.getWidth();
+        themeDialogHeight = dialog.getHeight();
+    }
+
+    /**
+     * @param dialog
+     */
+    public void getThemeDialogLocation(JDialog dialog) {
+        dialog.setBounds(themeDialogX, themeDialogY, themeDialogWidth, themeDialogHeight);
+    }
+
+    /**
+     * @return the themeDialogMainDividerLocation
+     */
+    public int getThemeDialogMainDividerLocation() {
+        return themeDialogMainDividerLocation;
+    }
+
+    /**
+     * @param themeDialogMainDividerLocation the themeDialogMainDividerLocation to set
+     */
+    public void setThemeDialogMainDividerLocation(int themeDialogMainDividerLocation) {
+        this.themeDialogMainDividerLocation = themeDialogMainDividerLocation;
+    }
+
+    /**
+     * @return the themeDialogStyleDividerLocation
+     */
+    public int getThemeDialogStyleDividerLocation() {
+        return themeDialogStyleDividerLocation;
+    }
+
+    /**
+     * @param themeDialogStyleDividerLocation the themeDialogStyleDividerLocation to set
+     */
+    public void setThemeDialogStyleDividerLocation(int themeDialogStyleDividerLocation) {
+        this.themeDialogStyleDividerLocation = themeDialogStyleDividerLocation;
     }
 }

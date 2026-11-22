@@ -27,6 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import io.github.markbernard.jedit.JEdit;
+import io.github.markbernard.jedit.Translations;
 import io.github.markbernard.jedit.dialog.SearchDialog;
 
 /**
@@ -47,7 +48,7 @@ public class DialogAction {
         public MatchCaseAction() {
             putValue(MNEMONIC_KEY, KeyEvent.VK_C);
             putValue(DISPLAYED_MNEMONIC_INDEX_KEY, 6);
-            putValue(NAME, "Match case");
+            putValue(NAME, Translations.getString("DialogAction.MatchCaseAction.constuctor.matchcase"));
         }
         
         @Override
@@ -72,7 +73,7 @@ public class DialogAction {
             this.jNotepad = jNotepad;
             this.searchDialog = searchDialog;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
-            putValue(NAME, "Replace");
+            putValue(NAME, Translations.getString("DialogAction.ReplaceAction.constuctor.replace"));
         }
         
         @Override
@@ -85,7 +86,7 @@ public class DialogAction {
                     jNotepad.setMatchCase(searchDialog.isMatchCase());
                     jNotepad.performReplace();
                 }
-            }, "Replace (dialog)").start();
+            }, Translations.getString("DialogAction.ReplaceAction.actionPerformed.replacedialog")).start();
         }
     }
 
@@ -106,7 +107,7 @@ public class DialogAction {
             this.searchDialog = searchDialog;
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(DISPLAYED_MNEMONIC_INDEX_KEY, 8);
-            putValue(NAME, "Replace All");
+            putValue(NAME, Translations.getString("DialogAction.ReplaceAllAction.replaceall"));
         }
         
         @Override
@@ -119,7 +120,7 @@ public class DialogAction {
                     jNotepad.setMatchCase(searchDialog.isMatchCase());
                     jNotepad.replaceAll();
                 }
-            }, "Replace All").start();
+            }, Translations.getString("DialogAction.ReplaceAllAction.replaceall")).start();
         }
     }
 
@@ -136,7 +137,7 @@ public class DialogAction {
         public CancelAction(JDialog dialog) {
             this.dialog = dialog;
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
-            putValue(NAME, "Cancel");
+            putValue(NAME, Translations.getString("cancel"));
         }
         
         @Override

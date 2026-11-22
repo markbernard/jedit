@@ -47,11 +47,13 @@ public class Translations {
             }
         }
         
-        result = bundle.getString(key);
-        
-        if (params != null) {
-            for (int i=0;i<params.length;i++) {
-                result = result.replaceAll("\\$\\{" + i + "\\}", params[i]);
+        if (bundle.containsKey(key)) {
+            result = bundle.getString(key);
+
+            if (params != null) {
+                for (int i=0;i<params.length;i++) {
+                    result = result.replaceAll("\\$\\{" + i + "\\}", params[i]);
+                }
             }
         }
         

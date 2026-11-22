@@ -27,8 +27,12 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -63,6 +67,7 @@ import io.github.markbernard.jedit.action.FileAction;
 import io.github.markbernard.jedit.action.HelpAction;
 import io.github.markbernard.jedit.dialog.AboutDialog;
 import io.github.markbernard.jedit.dialog.SearchDialog;
+import io.github.markbernard.jedit.dialog.ThemeDialog;
 
 /**
  * 
@@ -94,18 +99,30 @@ public class JEdit implements WindowListener, KeyListener {
     private boolean insertMode = true;
     private boolean readOnly = false;
     private int newDocumentCounter;
+    private ApplicationPreferences applicationPreferences;
     
     /**
      * @param parent 
+     * @param args 
      */
-    public JEdit(JFrame parent) {
+    public JEdit(JFrame parent, String[] args) {
         this.parent = parent;
         parent.addWindowListener(this);
-        ApplicationPreferences.loadPrefs(parent);
+        applicationPreferences = ApplicationPreferences.getInstance();
+        applicationPreferences.loadPrefs(parent);
         editorPanel = new JPanel(new BorderLayout());
         parent.add(editorPanel, BorderLayout.CENTER);
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setOpaque(false);
+        tabbedPane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                if (tabIndex != -1 && e.getClickCount() == 2) {
+                    tabbedPane.removeTabAt(tabIndex);
+                }
+            };
+        });
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -123,7 +140,13 @@ public class JEdit implements WindowListener, KeyListener {
         createMenus();
         createToolBar();
         createStatusBar();
-        newDocument();
+        if (args.length == 0) {
+            newDocument();
+        } else {
+            for (String arg : args) {
+                loadFile(new File(arg));
+            }
+        }
     }
     
     private void createToolBar() {
@@ -229,6 +252,18 @@ public class JEdit implements WindowListener, KeyListener {
             encodingMenu.add(charsetMenuItem);
         }
 
+        JMenu preferencesMenu = new JMenu("Preferences");
+        bar.add(preferencesMenu);
+        JMenuItem styleMenuItem = new JMenuItem("Style");
+        preferencesMenu.add(styleMenuItem);
+        styleMenuItem.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ThemeDialog(parent).setVisible(true);
+            }
+        });
+
         JMenu helpMenu = new JMenu(new HelpAction());
         bar.add(helpMenu);
         JMenuItem helpAboutMenuItem = new JMenuItem(new HelpAction.AboutAction(this));
@@ -237,7 +272,7 @@ public class JEdit implements WindowListener, KeyListener {
     
     private void updateRecentDocuments() {
         fileRecentDocuments.removeAll();
-        List<String> recentDocuments = ApplicationPreferences.getRecentDocuments();
+        List<String> recentDocuments = applicationPreferences.getRecentDocuments();
         if (recentDocuments.size() > 0) {
             int item = 0;
             for (String recentDocumentPath : recentDocuments) {
@@ -643,7 +678,7 @@ public class JEdit implements WindowListener, KeyListener {
      * Show a file dialog and load the selected file.
      */
     public void load() {
-        String filePath = ApplicationPreferences.getCurrentFilePath();
+        String filePath = applicationPreferences.getCurrentFilePath();
         JFileChooser fileChooser = new JFileChooser(filePath);
         fileChooser.setMultiSelectionEnabled(true);
         if (fileChooser.showOpenDialog(editorPanel) == JFileChooser.APPROVE_OPTION) {
@@ -661,8 +696,8 @@ public class JEdit implements WindowListener, KeyListener {
         }
         TextDocument doc = new TextDocument(this, selectedFile);
         addDocumentToTabs(doc);
-        ApplicationPreferences.setCurrentFilePath(doc.getFilePath());
-        ApplicationPreferences.addDocument(doc.getFullFilePath());
+        applicationPreferences.setCurrentFilePath(doc.getFilePath());
+        applicationPreferences.addDocument(doc.getFullFilePath());
         updateRecentDocuments();
         if (removeInitialNewDoc) {
             tabbedPane.removeTabAt(0);
@@ -680,7 +715,7 @@ public class JEdit implements WindowListener, KeyListener {
         boolean saved = currentDocument.save();
 
         if (saved) {
-            ApplicationPreferences.addDocument(currentDocument.getFullFilePath());
+            applicationPreferences.addDocument(currentDocument.getFullFilePath());
             updateRecentDocuments();
             setTitle();
         }
@@ -698,7 +733,7 @@ public class JEdit implements WindowListener, KeyListener {
         boolean saved = currentDocument.saveAs();
         
         if (saved) {
-            ApplicationPreferences.addDocument(currentDocument.getFullFilePath());
+            applicationPreferences.addDocument(currentDocument.getFullFilePath());
             updateRecentDocuments();
             setTitle();
         }
@@ -815,7 +850,7 @@ public class JEdit implements WindowListener, KeyListener {
         }
         
         if (doExit) {
-            ApplicationPreferences.savePrefs(parent);
+            applicationPreferences.savePrefs(parent);
             System.exit(0);
         }
     }
@@ -889,8 +924,6 @@ public class JEdit implements WindowListener, KeyListener {
                 e.printStackTrace();
             }
         }
-        
-        ApplicationPreferences.setCurrentFont(new Font("Hack", Font.PLAIN, 16));
         try {
             // Make the application look native.
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -899,7 +932,7 @@ public class JEdit implements WindowListener, KeyListener {
         }
         JFrame f = new JFrame("JEdit");
         f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        new JEdit(f);
+        new JEdit(f, args);
         SwingUtilities.invokeLater(() -> f.setVisible(true));
     }
 }

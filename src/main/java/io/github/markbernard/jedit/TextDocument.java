@@ -74,12 +74,14 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.RUndoManager;
 import org.fife.ui.rtextarea.TextMode;
 
 import io.github.markbernard.jedit.dialog.EncodingDialog;
 import io.github.markbernard.jedit.dialog.GoToDialog;
+import io.github.markbernard.jedit.theme.ThemeManager;
 
 /**
  * @author Mark Bernard
@@ -108,6 +110,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private Charset charset;
     private Point caratPosition;
 
+    private ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
+    
     /**
      * @param jNotepad 
      * @param documentNumber Number to place beside new in the new file name.
@@ -153,7 +157,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         syntaxTextArea.addKeyListener(jNotepad);
         syntaxTextArea.addKeyListener(this);
         undoManager = syntaxTextArea.getUndoManager();
-        syntaxTextArea.setFont(ApplicationPreferences.getCurrentFont());
+        syntaxTextArea.setFont(applicationPreferences.getCurrentFont());
         removeKeyStrokes(syntaxTextArea);
         syntaxTextArea.getDocument().addDocumentListener(this);
         updateStatusBar(syntaxTextArea.getCaretPosition());
@@ -336,9 +340,9 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @param toolbar 
      */
     public void wordWrap(JCheckBoxMenuItem formatWordWrap) {
-        formatWordWrap.setSelected(ApplicationPreferences.isWordWrap());
+        formatWordWrap.setSelected(applicationPreferences.isWordWrap());
         formatWordWrap.repaint();
-        syntaxTextArea.setLineWrap(ApplicationPreferences.isWordWrap());
+        syntaxTextArea.setLineWrap(applicationPreferences.isWordWrap());
         syntaxTextArea.revalidate();
     }
 
@@ -420,8 +424,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         syntaxTextArea.requestFocusInWindow();
         updateStatusBar(syntaxTextArea.getCaretPosition());
         if (!fileName.equals(newFileName)) {
-            ApplicationPreferences.setCurrentFileName(fileName);
-            ApplicationPreferences.setCurrentFilePath(filePath);
+            applicationPreferences.setCurrentFileName(fileName);
+            applicationPreferences.setCurrentFilePath(filePath);
         }
     }
     
@@ -521,9 +525,21 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             while ((line = reader.readLine()) != null) {
                 content.append(line + NEW_LINE_CHAR[newLineTypeUsed]);
             }
+            in.close();
             syntaxTextArea.setText(content.toString());
             setLanguageInfo(DocumentFormatType.determineFormatFromFile(path.getAbsolutePath()));
-            in.close();
+            int index = filePath.lastIndexOf(".");
+            if (index > -1) {
+                String extension = filePath.substring(index + 1).toLowerCase();
+                try {
+                    Theme theme = ThemeManager.loadNativeTheme(extension);
+                    if (theme != null) {
+                        theme.apply(syntaxTextArea);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             undoManager.discardAllEdits();
             dirty = false;
             readOnly = !path.canWrite();
@@ -605,7 +621,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         boolean result = true;
         
         if (checkEncoding()) {
-            String filePath = ApplicationPreferences.getCurrentFilePath();
+            String filePath = applicationPreferences.getCurrentFilePath();
             JFileChooser fileChooser = new JFileChooser(filePath);
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
@@ -687,8 +703,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         DirtyStatus result = DirtyStatus.DONT_SAVE_FILE;
         
         if (dirty) {
-            String filePath = (fileName.equals(newFileName) ? fileName : 
-                ApplicationPreferences.getCurrentFilePath() + FILE_SEPARATOR + fileName);
+            String filePath = (fileName.equals(newFileName) ? fileName : applicationPreferences.getCurrentFilePath() + FILE_SEPARATOR + fileName);
             int choice = JOptionPane.showOptionDialog(this, 
                     "Do you want to save changes to " + filePath + "?", 
                     "JNotepad", 

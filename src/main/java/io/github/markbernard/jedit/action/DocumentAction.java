@@ -30,6 +30,7 @@ import io.github.markbernard.jedit.ApplicationPreferences;
 import io.github.markbernard.jedit.IconGenerator;
 import io.github.markbernard.jedit.JEdit;
 import io.github.markbernard.jedit.LanguageInfo;
+import io.github.markbernard.jedit.Translations;
 
 /**
  * 
@@ -42,7 +43,7 @@ public class DocumentAction extends AbstractAction {
      */
     public DocumentAction() {
         putValue(MNEMONIC_KEY, KeyEvent.VK_D);
-        putValue(NAME, "Document");
+        putValue(NAME, Translations.getString("DialogAction.constuctor.document"));
     }
 
     @Override
@@ -57,6 +58,7 @@ public class DocumentAction extends AbstractAction {
         private static WordWrapAction instance;
         
         private JEdit jNotepad;
+        private ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
 
         /**
          * @param jNotepad
@@ -78,12 +80,10 @@ public class DocumentAction extends AbstractAction {
         private WordWrapAction(JEdit jNotepad) {
             this.jNotepad = jNotepad;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
-            putValue(Action.NAME, "Word Wrap");
-            putValue(Action.SHORT_DESCRIPTION, "Toggle soft word wrap on or off.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" +
-                    (ApplicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" +
-                    (ApplicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+            putValue(Action.NAME, Translations.getString("DialogAction.WordWrapAction.wordwrap"));
+            putValue(Action.SHORT_DESCRIPTION, Translations.getString("DialogAction.WordWrapAction.constuctor.wordwrap.description"));
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
         }
 
         @Override
@@ -91,14 +91,12 @@ public class DocumentAction extends AbstractAction {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ApplicationPreferences.setWordWrap(!ApplicationPreferences.isWordWrap());
-                    putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" +
-                            (ApplicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
-                    putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" +
-                            (ApplicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+                    applicationPreferences.setWordWrap(!applicationPreferences.isWordWrap());
+                    putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+                    putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
                     jNotepad.wordWrap();
                 }
-            }, "Word Wrap").start();
+            }, Translations.getString("DialogAction.WordWrapAction.wordwrap")).start();
         }
         
     }
@@ -114,7 +112,7 @@ public class DocumentAction extends AbstractAction {
          */
         public LanguageAction() {
             putValue(MNEMONIC_KEY, KeyEvent.VK_L);
-            putValue(NAME, "Language");
+            putValue(NAME, Translations.getString("DialogAction.LanguageAction.constuctor.language"));
         }
 
         @Override
@@ -145,8 +143,7 @@ public class DocumentAction extends AbstractAction {
             public void actionPerformed(ActionEvent e) {
                 new Thread(() -> {
                     jNotepad.setLanguage(languageInfo);
-                },
-                "Change language to " + languageInfo.getName()).start();
+                }, Translations.getString("DialogAction.LanguageAction.LanguageChoiceAction.actionPerformed.changelanguage", languageInfo.getName())).start();
             }
         
         }
@@ -163,7 +160,7 @@ public class DocumentAction extends AbstractAction {
          */
         public EncodingAction() {
             putValue(MNEMONIC_KEY, KeyEvent.VK_E);
-            putValue(NAME, "Encoding");
+            putValue(NAME, Translations.getString("DialogAction.EncodingAction.constuctor.encoding"));
         }
 
         @Override
@@ -193,8 +190,7 @@ public class DocumentAction extends AbstractAction {
             public void actionPerformed(ActionEvent e) {
                 new Thread(() -> {
                     jNotepad.setCharset(charset);
-                },
-                "Change Character set to " + charset.displayName()).start();
+                }, Translations.getString("DialogAction.EncodingAction.CharsetAction.actionPerformed.changeset", charset.displayName())).start();
             }
         }
     }
