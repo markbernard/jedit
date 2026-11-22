@@ -100,7 +100,6 @@ public class ThemeManager {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             theme.save(bout);
             out.write(bout.toByteArray());
-            out.close();
             Serializer serializer = new Persister();
             rSyntaxTheme = serializer.read(RSyntaxTheme.class, new ByteArrayInputStream(bout.toByteArray()));
         } catch (Exception e) {
