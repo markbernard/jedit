@@ -28,7 +28,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -38,7 +37,6 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -53,11 +51,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.apache.jorphan.gui.MenuScroller;
 
@@ -77,13 +75,13 @@ public class JEdit implements WindowListener, KeyListener {
     private static final Object TAB_LOCK = new Object();
 
     private boolean insertPressed = false;
-    private JFrame parent;
+    private final JFrame parent;
     private TextDocument currentDocument;
     private JMenu fileRecentDocuments;
     private JMenuItem editUndoMenuItem;
     private JMenuItem editRedoMenuItem;
-    private JPanel editorPanel;
-    private JTabbedPane tabbedPane;
+    private final JPanel editorPanel;
+    private final JTabbedPane tabbedPane;
     private JLabel positionLabel;
     private JLabel capsLockLabel;
     private JLabel insertLabel;
@@ -99,7 +97,7 @@ public class JEdit implements WindowListener, KeyListener {
     private boolean insertMode = true;
     private boolean readOnly = false;
     private int newDocumentCounter;
-    private ApplicationPreferences applicationPreferences;
+    private final ApplicationPreferences applicationPreferences;
     
     /**
      * @param parent 
@@ -112,7 +110,7 @@ public class JEdit implements WindowListener, KeyListener {
         applicationPreferences.loadPrefs(parent);
         editorPanel = new JPanel(new BorderLayout());
         parent.add(editorPanel, BorderLayout.CENTER);
-        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(SwingConstants.TOP);
         tabbedPane.setOpaque(false);
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
@@ -121,17 +119,14 @@ public class JEdit implements WindowListener, KeyListener {
                 if (tabIndex != -1 && e.getClickCount() == 2) {
                     tabbedPane.removeTabAt(tabIndex);
                 }
-            };
+            }
         });
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                synchronized (TAB_LOCK) {
-                    if (tabbedPane.getTabCount() > 0) {
-                        currentDocument = (TextDocument) tabbedPane.getSelectedComponent();
-                        setTitle();
-                        currentDocument.shown();
-                    }
+        tabbedPane.addChangeListener((ChangeEvent e) -> {
+            synchronized (TAB_LOCK) {
+                if (tabbedPane.getTabCount() > 0) {
+                    currentDocument = (TextDocument) tabbedPane.getSelectedComponent();
+                    setTitle();
+                    currentDocument.shown();
                 }
             }
         });
@@ -240,7 +235,7 @@ public class JEdit implements WindowListener, KeyListener {
         documentMenu.add(documentLanguageMenu);
         new MenuScroller(documentLanguageMenu, 30);
         List<LanguageInfo> languageList = new ArrayList<>(DocumentFormatType.getAvailableLanguageInfo());
-        Collections.sort(languageList, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        languageList.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
         for (LanguageInfo languageInfo : languageList) {
             JMenuItem documentLanguageChoiceMenuItem = new JMenuItem(new DocumentAction.LanguageAction.LanguageChoiceAction(this, languageInfo));
             documentLanguageMenu.add(documentLanguageChoiceMenuItem);
@@ -256,13 +251,7 @@ public class JEdit implements WindowListener, KeyListener {
         bar.add(preferencesMenu);
         JMenuItem styleMenuItem = new JMenuItem("Style");
         preferencesMenu.add(styleMenuItem);
-        styleMenuItem.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new ThemeDialog(parent).setVisible(true);
-            }
-        });
+        styleMenuItem.addActionListener((ActionEvent e) -> new ThemeDialog(parent).setVisible(true));
 
         JMenu helpMenu = new JMenu(new HelpAction());
         bar.add(helpMenu);
@@ -273,7 +262,7 @@ public class JEdit implements WindowListener, KeyListener {
     private void updateRecentDocuments() {
         fileRecentDocuments.removeAll();
         List<String> recentDocuments = applicationPreferences.getRecentDocuments();
-        if (recentDocuments.size() > 0) {
+        if (recentDocuments.isEmpty()) {
             int item = 0;
             for (String recentDocumentPath : recentDocuments) {
                 fileRecentDocuments.add(new JMenuItem(new FileAction.FileRecentDocumentsAction.FileRecentDocumentsOpenDocumentAction(item, recentDocumentPath, this)));
@@ -346,9 +335,9 @@ public class JEdit implements WindowListener, KeyListener {
         filePathPanel.add(filePathLabel, BorderLayout.WEST);
         filePathLabel.setFont(statusBarFont);
 
-        //        if (ApplicationPreferences.isStatusBar()) {
+        if (applicationPreferences.isShowStatusBar()) {
             editorPanel.add(mainStatusBarPanel, BorderLayout.SOUTH);
-//        }
+        }
     }
 
     private void setStausBorder(JPanel panel) {
@@ -361,21 +350,18 @@ public class JEdit implements WindowListener, KeyListener {
      * @param position
      */
     public void updateStatusBar(String position) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (currentDocument != null) {
-                    editUndoMenuItem.setEnabled(currentDocument.canUndo());
-                    editRedoMenuItem.setEnabled(currentDocument.canRedo());
-                    insertMode = currentDocument.isInsertMode();
-                    updateCursorLocation(position);
-                    updateCapsLock();
-                    updateInsertMode();
-                    updateReadOnly();
-                    updateEncoding();
-                    updateLanguage();
-                    updateFilePath();
-                }
+        SwingUtilities.invokeLater(() -> {
+            if (currentDocument != null) {
+                editUndoMenuItem.setEnabled(currentDocument.canUndo());
+                editRedoMenuItem.setEnabled(currentDocument.canRedo());
+                insertMode = currentDocument.isInsertMode();
+                updateCursorLocation(position);
+                updateCapsLock();
+                updateInsertMode();
+                updateReadOnly();
+                updateEncoding();
+                updateLanguage();
+                updateFilePath();
             }
         });
     }
@@ -430,7 +416,7 @@ public class JEdit implements WindowListener, KeyListener {
     private void updateFilePath() {
         if (currentDocument != null) {
             String path = currentDocument.getFilePath();
-            if (path.length() > 0) {
+            if (path.isEmpty()) {
                 path += "/";
             }
             filePathLabel.setText(path + currentDocument.getFileName());
@@ -484,48 +470,28 @@ public class JEdit implements WindowListener, KeyListener {
      * Undo the last text input
      */
     public void undo() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.undo();
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.undo() );
     }
     
     /**
      * Redo the last text input
      */
     public void redo() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.redo();
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.redo() );
     }
     
     /**
      * Cut the selected text and place it in the system clipboard
      */
     public void cut() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.cut();
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.cut() );
     }
     
     /**
      * Copy the selected text and place it in the system clipboard
      */
     public void copy() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.copy();
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.copy() );
     }
     
     /**
@@ -536,12 +502,7 @@ public class JEdit implements WindowListener, KeyListener {
         DataFlavor[] flavors = clipboard.getAvailableDataFlavors();
         for (DataFlavor flavor : flavors) {
             if (flavor.isFlavorTextType() && flavor.isMimeTypeSerializedObject()) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        currentDocument.performPaste(flavor, clipboard);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> currentDocument.performPaste(flavor, clipboard) );
             }
         }
     }
@@ -551,12 +512,9 @@ public class JEdit implements WindowListener, KeyListener {
      */
     public void find() {
         JEdit self = this;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SearchDialog dialog = new SearchDialog(parent, self, false);
-                dialog.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            SearchDialog dialog = new SearchDialog(parent, self, false);
+            dialog.setVisible(true);
         });
     }
     
@@ -577,12 +535,9 @@ public class JEdit implements WindowListener, KeyListener {
      */
     public void replace() {
         JEdit self = this;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SearchDialog dialog = new SearchDialog(parent, self, true);
-                dialog.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            SearchDialog dialog = new SearchDialog(parent, self, true);
+            dialog.setVisible(true);
         });
     }
     
@@ -590,48 +545,28 @@ public class JEdit implements WindowListener, KeyListener {
      * 
      */
     public void performReplace() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.performReplace(findTerm, replaceTerm, matchCase);
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.performReplace(findTerm, replaceTerm, matchCase) );
     }
     
     /**
      * 
      */
     public void replaceAll() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.replaceAll(findTerm, replaceTerm, matchCase);
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.replaceAll(findTerm, replaceTerm, matchCase) );
     }
     
     /**
      * Place the cursor on the beginning of the line number select by the user.
      */
     public void goTo() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.goTo(parent);
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.goTo(parent) );
     }
 
     /**
      * Selects all text in the JTextArea.
      */
     public void selectAll() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.selectAll();
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.selectAll() );
     }
 
     /**
@@ -649,7 +584,7 @@ public class JEdit implements WindowListener, KeyListener {
             TabComponent tabComponent = new TabComponent(this, doc.getTitle());
             tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(doc), tabComponent);
             tabbedPane.setSelectedComponent(doc);
-            SwingUtilities.invokeLater(() -> doc.shown());
+            SwingUtilities.invokeLater(doc::shown);
         }
     }
 
@@ -691,7 +626,7 @@ public class JEdit implements WindowListener, KeyListener {
     
     private void loadFile(File selectedFile) {
         boolean removeInitialNewDoc = false;
-        if (tabbedPane.getTabCount() == 1 && Pattern.matches("new \\d+", currentDocument.getTitle()) & !currentDocument.isDirty()) {
+        if (tabbedPane.getTabCount() == 1 && Pattern.matches("new \\d+", currentDocument.getTitle()) && !currentDocument.isDirty()) {
             removeInitialNewDoc = true;
         }
         TextDocument doc = new TextDocument(this, selectedFile);
@@ -768,17 +703,14 @@ public class JEdit implements WindowListener, KeyListener {
      * Update the main title with the currently selected tab.
      */
     public void setTitle() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (TAB_LOCK) {
-                    if (currentDocument != null) {
-                        parent.setTitle(currentDocument.getTitle() + " - " + APPLICATION_TITLE);
-                        int index = tabbedPane.indexOfComponent(currentDocument);
-                        if (index > -1) {
-                            TabComponent tabComponent = (TabComponent) tabbedPane.getTabComponentAt(index);
-                            tabComponent.setName(currentDocument.getTitle());
-                        }
+        SwingUtilities.invokeLater(() -> {
+            synchronized (TAB_LOCK) {
+                if (currentDocument != null) {
+                    parent.setTitle(currentDocument.getTitle() + " - " + APPLICATION_TITLE);
+                    int index = tabbedPane.indexOfComponent(currentDocument);
+                    if (index > -1) {
+                        TabComponent tabComponent = (TabComponent) tabbedPane.getTabComponentAt(index);
+                        tabComponent.setName(currentDocument.getTitle());
                     }
                 }
             }
@@ -789,12 +721,7 @@ public class JEdit implements WindowListener, KeyListener {
      * Toggle word wrapping
      */
     public void wordWrap() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                currentDocument.wordWrap(formatWordWrap);
-            }
-        });
+        SwingUtilities.invokeLater(() -> currentDocument.wordWrap(formatWordWrap) );
     }
 
     /**
@@ -829,12 +756,9 @@ public class JEdit implements WindowListener, KeyListener {
      * 
      */
     public void about() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                AboutDialog aboutDialog = new AboutDialog(parent);
-                aboutDialog.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            AboutDialog aboutDialog = new AboutDialog(parent);
+            aboutDialog.setVisible(true);
         });
     }
     /**
@@ -866,19 +790,29 @@ public class JEdit implements WindowListener, KeyListener {
     }
 
     @Override
-    public void windowClosed(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {
+        /** not used */
+    }
 
     @Override
-    public void windowIconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e)  {
+        /** not used */
+    }
 
     @Override
-    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e)  {
+        /** not used */
+    }
 
     @Override
-    public void windowActivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e)  {
+        /** not used */
+    }
 
     @Override
-    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e)  {
+        /** not used */
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -899,7 +833,8 @@ public class JEdit implements WindowListener, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent e)  {
+        /** not used */
     }
     
     /**
@@ -930,8 +865,7 @@ public class JEdit implements WindowListener, KeyListener {
         } catch (Exception e) {
             // System look and feel is always present.
         }
-        JFrame f = new JFrame("JEdit");
-        f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        JFrame f = new JFrame(JEdit.APPLICATION_TITLE);
         new JEdit(f, args);
         SwingUtilities.invokeLater(() -> f.setVisible(true));
     }

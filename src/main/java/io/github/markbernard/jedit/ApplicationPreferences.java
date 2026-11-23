@@ -90,6 +90,8 @@ public class ApplicationPreferences {
     private int themeDialogMainDividerLocation;
     @Element(required = false)
     private int themeDialogStyleDividerLocation;
+    @Element(required = false)
+    private boolean showStatusBar;
     
     /**
      * @return The one instance
@@ -145,6 +147,7 @@ public class ApplicationPreferences {
         themeDialogHeight = 768;
         themeDialogMainDividerLocation = 120;
         themeDialogStyleDividerLocation = 425;
+        showStatusBar = true;
     }
     
     private void copy(ApplicationPreferences copyFrom) {
@@ -168,6 +171,7 @@ public class ApplicationPreferences {
         themeDialogHeight = copyFrom.themeDialogHeight;
         themeDialogMainDividerLocation = copyFrom.themeDialogMainDividerLocation;
         themeDialogStyleDividerLocation = copyFrom.themeDialogStyleDividerLocation;
+        showStatusBar = copyFrom.showStatusBar;
     }
     
     /**
@@ -437,5 +441,19 @@ public class ApplicationPreferences {
      */
     public void setThemeDialogStyleDividerLocation(int themeDialogStyleDividerLocation) {
         this.themeDialogStyleDividerLocation = themeDialogStyleDividerLocation;
+    }
+
+    /**
+     * @return true if the status bar is to be shown
+     */
+    public boolean isShowStatusBar() {
+        return showStatusBar;
+    }
+
+    /**
+     * @param showStatusBar
+     */
+    public void setShowStatusBar(boolean showStatusBar) {
+        this.showStatusBar = showStatusBar;
     }
 }
