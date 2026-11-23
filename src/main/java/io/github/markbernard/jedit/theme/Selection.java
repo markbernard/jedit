@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -40,12 +42,23 @@ public class Selection {
     /** */
     @Attribute
     public boolean useFG;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(Selection other) {
-        return bg.equals(other.bg) && fg.equals(other.fg) && roundedEdges == other.roundedEdges && useFG == other.useFG;
+    @Override
+    public int hashCode() {
+        return Objects.hash(bg, fg, roundedEdges, useFG);
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Selection other = (Selection) obj;
+        return Objects.equals(bg, other.bg) && Objects.equals(fg, other.fg) && roundedEdges == other.roundedEdges && useFG == other.useFG;
+    }
+    
 }

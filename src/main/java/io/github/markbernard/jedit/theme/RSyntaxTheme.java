@@ -20,6 +20,7 @@
 package io.github.markbernard.jedit.theme;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -94,42 +95,31 @@ public class RSyntaxTheme {
     @ElementList(inline = true)
     public List<Style> tokenStyles;
     
-    /**
-     * @param themeToCheck
-     * @return true if all fields are equal
-     */
-    public boolean equals(RSyntaxTheme themeToCheck) {
-        boolean result = baseFont.equals(themeToCheck.baseFont);
-        result &= background.equals(themeToCheck.background);
-        result &= caret.equals(themeToCheck.caret);
-        result &= selection.equals(themeToCheck.selection);
-        result &= currentLineHighlight.equals(themeToCheck.currentLineHighlight);
-        result &= tabLine.equals(themeToCheck.tabLine);
-        result &= marginLine.equals(themeToCheck.marginLine);
-        result &= markAllHighlight.equals(themeToCheck.markAllHighlight);
-        result &= markOccurrencesHighlight.equals(themeToCheck.markOccurrencesHighlight);
-        result &= matchedBracket.equals(themeToCheck.matchedBracket);
-        result &= hyperlinks.equals(themeToCheck.hyperlinks);
-        result &= gutterBackground.equals(themeToCheck.gutterBackground);
-        result &= gutterBorder.equals(themeToCheck.gutterBorder);
-        result &= lineNumbers.equals(themeToCheck.lineNumbers);
-        result &= foldIndicator.equals(themeToCheck.foldIndicator);
-        result &= iconRowHeader.equals(themeToCheck.iconRowHeader);
-        if (secondaryLanguages.size() == themeToCheck.secondaryLanguages.size()) {
-            for (int i=0;i<secondaryLanguages.size();i++) {
-                result &= secondaryLanguages.get(i).equals(themeToCheck.secondaryLanguages.get(i));
-            }
-        } else {
-            result = false;
-        }
-        if (tokenStyles.size() == themeToCheck.tokenStyles.size()) {
-            for (int i=0;i<tokenStyles.size();i++) {
-                result &= tokenStyles.get(i).equals(themeToCheck.tokenStyles.get(i));
-            }
-        } else {
-            result = false;
-        }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(background, baseFont, caret, currentLineHighlight, foldIndicator, gutterBackground, gutterBorder, hyperlinks, iconRowHeader, lineNumbers, marginLine, markAllHighlight,
+                markOccurrencesHighlight, matchedBracket, secondaryLanguages, selection, tabLine, tokenStyles, version);
+    }
 
-        return result;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        RSyntaxTheme other = (RSyntaxTheme) obj;
+        return Objects.equals(background, other.background) && Objects.equals(baseFont, other.baseFont) && Objects.equals(caret, other.caret)
+                && Objects.equals(currentLineHighlight, other.currentLineHighlight) && Objects.equals(foldIndicator, other.foldIndicator) && Objects.equals(gutterBackground, other.gutterBackground)
+                && Objects.equals(gutterBorder, other.gutterBorder) && Objects.equals(hyperlinks, other.hyperlinks) && Objects.equals(iconRowHeader, other.iconRowHeader)
+                && Objects.equals(lineNumbers, other.lineNumbers) && Objects.equals(marginLine, other.marginLine) && Objects.equals(markAllHighlight, other.markAllHighlight)
+                && Objects.equals(markOccurrencesHighlight, other.markOccurrencesHighlight) && Objects.equals(matchedBracket, other.matchedBracket)
+                && Objects.equals(secondaryLanguages, other.secondaryLanguages) && Objects.equals(selection, other.selection) && Objects.equals(tabLine, other.tabLine)
+                && Objects.equals(tokenStyles, other.tokenStyles) && Objects.equals(version, other.version);
     }
 }

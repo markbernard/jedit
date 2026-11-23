@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -34,12 +36,22 @@ public class IconRowHeader {
     /** */
     @Attribute
     public boolean inheritsGutterBG;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(IconRowHeader other) {
-        return activeLineRange.equals(other.activeLineRange) && inheritsGutterBG == other.inheritsGutterBG;
+    @Override
+    public int hashCode() {
+        return Objects.hash(activeLineRange, inheritsGutterBG);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        IconRowHeader other = (IconRowHeader) obj;
+        return Objects.equals(activeLineRange, other.activeLineRange) && inheritsGutterBG == other.inheritsGutterBG;
     }
 }

@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -34,12 +36,22 @@ public class FoldIndicator {
     /** */
     @Attribute
     public String iconBg;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(FoldIndicator other) {
-        return fg.equals(other.fg) && iconBg.equals(other.iconBg);
+    @Override
+    public int hashCode() {
+        return Objects.hash(fg, iconBg);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        FoldIndicator other = (FoldIndicator) obj;
+        return Objects.equals(fg, other.fg) && Objects.equals(iconBg, other.iconBg);
     }
 }

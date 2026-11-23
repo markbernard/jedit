@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -31,12 +33,24 @@ public class Hyperlinks {
     /** */
     @Attribute
     public String fg;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(Hyperlinks other) {
-        return fg.equals(other.fg);
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fg);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Hyperlinks other = (Hyperlinks) obj;
+        return Objects.equals(fg, other.fg);
     }
 }

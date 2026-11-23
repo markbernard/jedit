@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -40,12 +42,22 @@ public class MatchedBracket {
     /** */
     @Attribute
     public boolean highlightBoth;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(MatchedBracket other) {
-        return animate == other.animate && bg.equals(other.bg) && fg.equals(other.fg) && highlightBoth == other.highlightBoth;
+    @Override
+    public int hashCode() {
+        return Objects.hash(animate, bg, fg, highlightBoth);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MatchedBracket other = (MatchedBracket) obj;
+        return animate == other.animate && Objects.equals(bg, other.bg) && Objects.equals(fg, other.fg) && highlightBoth == other.highlightBoth;
     }
 }

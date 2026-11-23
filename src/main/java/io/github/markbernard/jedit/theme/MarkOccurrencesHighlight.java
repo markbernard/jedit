@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -34,12 +36,22 @@ public class MarkOccurrencesHighlight {
     /** */
     @Attribute
     public String color;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(MarkOccurrencesHighlight other) {
-        return border == other.border && color.equals(other.color);
+    @Override
+    public int hashCode() {
+        return Objects.hash(border, color);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MarkOccurrencesHighlight other = (MarkOccurrencesHighlight) obj;
+        return border == other.border && Objects.equals(color, other.color);
     }
 }

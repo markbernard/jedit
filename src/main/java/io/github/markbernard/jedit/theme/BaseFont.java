@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -31,12 +33,24 @@ public class BaseFont {
     /** */
     @Attribute
     public int size;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(BaseFont other) {
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(size);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        BaseFont other = (BaseFont) obj;
         return size == other.size;
     }
 }

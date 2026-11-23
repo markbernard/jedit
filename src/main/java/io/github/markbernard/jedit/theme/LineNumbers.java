@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -37,12 +39,23 @@ public class LineNumbers {
     /** */
     @Attribute
     public int fontSize;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(LineNumbers other) {
-        return fg.equals(other.fg) && fontFamily.equals(other.fontFamily) && fontSize == other.fontSize;
+    @Override
+    public int hashCode() {
+        return Objects.hash(fg, fontFamily, fontSize);
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        LineNumbers other = (LineNumbers) obj;
+        return Objects.equals(fg, other.fg) && Objects.equals(fontFamily, other.fontFamily) && fontSize == other.fontSize;
+    }
+
 }

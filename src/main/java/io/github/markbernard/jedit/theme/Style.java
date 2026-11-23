@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -41,18 +43,24 @@ public class Style {
     @Attribute(required = true)
     public String token;
     
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(Style other) {
-        boolean result = true;
-        
-        result &= ((bold == null && other.bold == null) || bold.equals(other.bold)); 
-        result &= (fg == null && other.fg == null) || fg.equals(other.fg);
-        result &= ((italic == null && other.italic == null) || italic.equals(other.italic)); 
-        result &= token.equals(other.token);
-        
-        return result;
+    @Override
+    public int hashCode() {
+        return Objects.hash(bold, fg, italic, token);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Style other = (Style) obj;
+
+        return Objects.equals(bold, other.bold) && Objects.equals(fg, other.fg) && Objects.equals(italic, other.italic) && Objects.equals(token, other.token);
     }
 }

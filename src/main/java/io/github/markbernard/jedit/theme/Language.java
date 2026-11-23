@@ -19,6 +19,8 @@
  */
 package io.github.markbernard.jedit.theme;
 
+import java.util.Objects;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -34,12 +36,23 @@ public class Language {
     /** */
     @Attribute
     public int index;
-    
-    /**
-     * @param other
-     * @return true if all fields are equal
-     */
-    public boolean equals(Language other) {
-        return bg.equals(other.bg) && index == other.index;
+    @Override
+    public int hashCode() {
+        return Objects.hash(bg, index);
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Language other = (Language) obj;
+        return Objects.equals(bg, other.bg) && index == other.index;
+    }
+
 }
