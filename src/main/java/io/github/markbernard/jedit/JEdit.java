@@ -239,7 +239,7 @@ public class JEdit implements WindowListener, KeyListener {
         JMenu documentLanguageMenu = new JMenu(new DocumentAction.LanguageAction());
         documentMenu.add(documentLanguageMenu);
         new MenuScroller(documentLanguageMenu, 30);
-        List<LanguageInfo> languageList = new ArrayList<>(DocumentFormatType.FILE_TYPE_MAP.values());
+        List<LanguageInfo> languageList = new ArrayList<>(DocumentFormatType.getAvailableLanguageInfo());
         Collections.sort(languageList, (o1, o2) -> o1.getName().compareTo(o2.getName()));
         for (LanguageInfo languageInfo : languageList) {
             JMenuItem documentLanguageChoiceMenuItem = new JMenuItem(new DocumentAction.LanguageAction.LanguageChoiceAction(this, languageInfo));

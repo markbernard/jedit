@@ -19,8 +19,10 @@
  */
 package io.github.markbernard.jedit;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
@@ -29,7 +31,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
  */
 public class DocumentFormatType {
     /** Map of all file types that are supported */
-    public static final Map<String, LanguageInfo> FILE_TYPE_MAP = new HashMap<>();
+    private static final Map<String, LanguageInfo> FILE_TYPE_MAP = new HashMap<>();
     
     private DocumentFormatType() {}
     
@@ -90,12 +92,38 @@ public class DocumentFormatType {
         int index = filePath.lastIndexOf(".");
         if (index > -1) {
             String extension = filePath.substring(index + 1).toLowerCase();
-            LanguageInfo languageInfo = FILE_TYPE_MAP.get(extension);
-            if (languageInfo != null) {
-                result = languageInfo;
-            }
+            result = determineFormatFromExtension(extension);
         }
         
         return result;
+    }
+
+    /**
+     * @param extension
+     * @return the format type
+     */
+    public static LanguageInfo determineFormatFromExtension(String extension) {
+        LanguageInfo result = new LanguageInfo(SyntaxConstants.SYNTAX_STYLE_NONE, "None", "");
+        
+        LanguageInfo languageInfo = FILE_TYPE_MAP.get(extension);
+        if (languageInfo != null) {
+            result = languageInfo;
+        }
+        
+        return result;
+    }
+    
+    /**
+     * @return all extensions with syntax coloring
+     */
+    public static Set<String> getAvailableExtensions() {
+        return FILE_TYPE_MAP.keySet();
+    }
+    
+    /**
+     * @return all LanguageInfo with syntax coloring
+     */
+    public static Collection<LanguageInfo> getAvailableLanguageInfo() {
+        return FILE_TYPE_MAP.values();
     }
 }

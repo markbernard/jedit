@@ -125,14 +125,14 @@ public class ThemeDialog extends JDialog implements WindowListener {
         JScrollPane languageScroll = new JScrollPane(languagePanel);
         mainSplit.add(languageScroll, JSplitPane.LEFT);
         languageScroll.getVerticalScrollBar().setUnitIncrement(10);
-        List<String> documentTypes = new ArrayList<>(DocumentFormatType.FILE_TYPE_MAP.keySet());
+        List<String> documentTypes = new ArrayList<>(DocumentFormatType.getAvailableExtensions());
         Collections.sort(documentTypes);
-        languageList = new JList<>(documentTypes.toArray(new String[DocumentFormatType.FILE_TYPE_MAP.size()]));
+        languageList = new JList<>(documentTypes.toArray(new String[documentTypes.size()]));
         languageList.setSelectionModel(new DefaultListSelectionModel() {
             @Override
             public void setSelectionInterval(int index0, int index1) {
                 if (loadedTheme != null && currentTheme != null && !loadedTheme.equals(currentTheme)) {
-                    if (JOptionPane.showConfirmDialog(null, "Are you sure you want to leave without saving changes?", "Abandon Changes", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                    if (JOptionPane.showConfirmDialog(null, "Click OK to leave without saving changes.", "Abandon Changes", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
                         return;
                     }
                 }
