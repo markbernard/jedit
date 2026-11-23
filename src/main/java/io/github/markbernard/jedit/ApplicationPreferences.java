@@ -20,6 +20,7 @@
 package io.github.markbernard.jedit;
 
 import java.awt.Font;
+import java.awt.Frame;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,10 @@ import org.simpleframework.xml.core.Persister;
  */
 @Root
 public class ApplicationPreferences {
+    /** Define in one spot to use everywhere */
+    public static final String FILE_PATH_SEPARATOR = System.getProperty("file.separator");
+
+    private static final String USER_HOME = System.getProperty("user.home");
     private static final String CONFIG_FILE_NAME = "jedit_config.xml";
     
     private static ApplicationPreferences instance;
@@ -100,14 +105,14 @@ public class ApplicationPreferences {
     private ApplicationPreferences() {
         String os = System.getProperty("os.name", "Linux");
         if (os.toLowerCase().contains("mac")) {
-            configurationPath = new File(System.getProperty("user.home") + "/Library/Preferences/jedit");
+            configurationPath = new File(USER_HOME + "/Library/Preferences/jedit");
         } else if (os.toLowerCase().contains("windows")) {
             configurationPath = new File(System.getenv("localappdata") + "/jedit");
         } else {
             //Default to Linux
             String configPath = System.getenv("XDG_CONFIG_HOME");
             if (configPath == null) {
-                configPath = System.getProperty("user.home") + "/.config";
+                configPath = USER_HOME + "/.config";
             }
             configurationPath = new File(configPath + "/jedit");
         }
@@ -126,7 +131,7 @@ public class ApplicationPreferences {
         windowHeight = 768;
         windowMaximized = false;
         currentFileName = "Untitled";
-        currentFilePath = System.getProperty("user.home");
+        currentFilePath = USER_HOME;
         wordWrap = false;
         statusBar = true;
         currentFontName = "Hack";
@@ -174,7 +179,7 @@ public class ApplicationPreferences {
     public void loadPrefs(JFrame frame) {
         if (configurationPath.exists()) {
             try {
-                File configFile = new File(configurationPath.getAbsolutePath() + "/" + CONFIG_FILE_NAME);
+                File configFile = new File(configurationPath.getAbsolutePath() + FILE_PATH_SEPARATOR + CONFIG_FILE_NAME);
                 if (configFile.exists()) {
                     Serializer serializer = new Persister();
                     ApplicationPreferences temp = serializer.read(ApplicationPreferences.class, configFile);
@@ -182,7 +187,7 @@ public class ApplicationPreferences {
                 }
                 frame.setBounds(windowX, windowY, windowWidth, windowHeight);
                 if (windowMaximized) {
-                    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    frame.setExtendedState(Frame.MAXIMIZED_BOTH);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -199,7 +204,7 @@ public class ApplicationPreferences {
     public void savePrefs(JFrame frame) {
         if (configurationPath.exists()) {
             try {
-                windowMaximized = frame.getExtendedState() == JFrame.MAXIMIZED_BOTH;
+                windowMaximized = frame.getExtendedState() == Frame.MAXIMIZED_BOTH;
                 if (!windowMaximized) {
                     windowX = frame.getX();
                     windowY = frame.getY();
@@ -207,7 +212,7 @@ public class ApplicationPreferences {
                     windowHeight = frame.getHeight();
                 }
                 Serializer serializer = new Persister();
-                serializer.write(this, new File(configurationPath.getAbsolutePath() + "/" + CONFIG_FILE_NAME));
+                serializer.write(this, new File(configurationPath.getAbsolutePath() + FILE_PATH_SEPARATOR + CONFIG_FILE_NAME));
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -31,6 +31,8 @@ public class DocumentFormatType {
     /** Map of all file types that are supported */
     public static final Map<String, LanguageInfo> FILE_TYPE_MAP = new HashMap<>();
     
+    private DocumentFormatType() {}
+    
     static {
         FILE_TYPE_MAP.put("asm", new LanguageInfo(SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86, "Assembler", "asm"));
         FILE_TYPE_MAP.put("c", new LanguageInfo(SyntaxConstants.SYNTAX_STYLE_C, "C", "c"));

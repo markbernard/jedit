@@ -47,9 +47,13 @@ import io.github.markbernard.jedit.LanguageInfo;
  * 
  */
 public class ThemeManager {
+private static final String THEME_FILE_NAME = "_theme.xml";
+
     private static String themePathString = ApplicationPreferences.getInstance().getConfigurationPath().getAbsolutePath() + "/themes";
     private static File themePath;
     
+    private ThemeManager() {}
+
     /**
      * @param theme
      * @param langaugeExtension 
@@ -59,7 +63,7 @@ public class ThemeManager {
         initPath();
         Format format = new Format(4, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<!DOCTYPE RSyntaxTheme SYSTEM \"theme.dtd\">");
         Serializer serializer = new Persister(format);
-        try (Writer out = new OutputStreamWriter(new FileOutputStream(new File(themePathString + "/" + langaugeExtension + "_theme.xml")), StandardCharsets.UTF_8)) {
+        try (Writer out = new OutputStreamWriter(new FileOutputStream(new File(themePathString + ApplicationPreferences.FILE_PATH_SEPARATOR + langaugeExtension + THEME_FILE_NAME)), StandardCharsets.UTF_8)) {
             serializer.write(theme, out);
             out.write("\n");
         }
@@ -73,7 +77,7 @@ public class ThemeManager {
     public static RSyntaxTheme load(String langaugeExtension) throws Exception {
         RSyntaxTheme rSyntaxTheme = null;
         initPath();
-        File themeFile = new File(themePathString + "/" + langaugeExtension + "_theme.xml");
+        File themeFile = new File(themePathString + ApplicationPreferences.FILE_PATH_SEPARATOR + langaugeExtension + THEME_FILE_NAME);
         if (themeFile.exists()) {
             Serializer serializer = new Persister();
             try (Reader in = new InputStreamReader(new FileInputStream(themeFile), StandardCharsets.UTF_8)) {
@@ -91,7 +95,7 @@ public class ThemeManager {
     public static RSyntaxTheme getDefaultTheme(String langaugeExtension) {
         RSyntaxTheme rSyntaxTheme = null;
         
-        try (OutputStream out = new FileOutputStream(new File(themePathString + "/" + langaugeExtension + "_theme.xml"))) {
+        try (OutputStream out = new FileOutputStream(new File(themePathString + ApplicationPreferences.FILE_PATH_SEPARATOR + langaugeExtension + THEME_FILE_NAME))) {
             RSyntaxTextArea area = new RSyntaxTextArea();
             new RTextScrollPane(area); // required to get all parts the the theme
             LanguageInfo languageInfo =  DocumentFormatType.determineFormatFromFile("." + langaugeExtension);
@@ -117,7 +121,7 @@ public class ThemeManager {
     public static Theme loadNativeTheme(String langaugeExtension) throws Exception {
         Theme theme = null;
         initPath();
-        File themeFile = new File(themePathString + "/" + langaugeExtension + "_theme.xml");
+        File themeFile = new File(themePathString + ApplicationPreferences.FILE_PATH_SEPARATOR + langaugeExtension + THEME_FILE_NAME);
         if (themeFile.exists()) {
             try (InputStream in = new FileInputStream(themeFile)) {
                 theme = Theme.load(in);
