@@ -1,0 +1,8 @@
+Package: jedit
+Version: 1.0.0
+Section: misc
+Priority: optional
+Architecture: all
+Depends: openjdk-17-jre | openjdk-21-jre | openjdk-16-jre | default-jre (>= 2:1.16)
+Maintainer: Mark Bernard <captainjester@hotmail.com>
+Description: Text editor with syntax coloring

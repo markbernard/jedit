@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>jnotepad</groupId>
+    <groupId>jedit</groupId>
     <artifactId>jedit</artifactId>
     <version>1.0.0</version>
     <name>JEdit</name>
@@ -65,6 +65,86 @@
                                     <mainClass>io.github.markbernard.jedit.JEdit</mainClass>
                                 </transformer>
                             </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+              <groupId>de.dentrassi.maven</groupId>
+              <artifactId>rpm</artifactId>
+              <version>1.10.1</version>
+              <executions>
+                <execution>
+                  <id>build-rpm</id>
+                  <goals>
+                    <goal>rpm</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <packageName>${project.artifactId}</packageName>
+                <group>Application/Misc</group>
+                <packager>Mark Bernard</packager>
+                <requires>
+                  <require>
+                    <name>jre</name>
+                    <version>16</version>
+                    <greaterOrEqual/>
+                  </require>
+                </requires>
+                <entries>
+                  <entry>
+                    <name>/usr/bin/jedit</name>
+                    <file>${project.basedir}/src/main/scripts/jedit.sh</file>
+                    <mode>0755</mode>
+                  </entry>
+                  <entry>
+                    <name>/opt/jedit/${project.build.finalName}.jar</name>
+                    <file>${project.build.directory}/${project.build.finalName}.jar</file>
+                    <mode>0644</mode>
+                  </entry>
+                </entries>
+              </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+                <version>1.14</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <controlDir>${basedir}/src/main/deb</controlDir>
+                            <dataSet>
+                                <data>
+                                    <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/opt/${project.artifactId}</prefix>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>src/main/scripts/jedit.sh</src>
+                                    <dst>/usr/bin/jedit</dst>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <user>root</user>
+                                        <group>root</group>
+                                        <filemode>755</filemode>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <type>template</type>
+                                    <paths>
+                                        <path>/var/log/${project.artifactId}</path>
+                                    </paths>
+                                </data>
+                            </dataSet>
                         </configuration>
                     </execution>
                 </executions>
