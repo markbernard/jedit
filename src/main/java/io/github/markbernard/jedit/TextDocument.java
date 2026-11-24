@@ -43,7 +43,6 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.attribute.DosFileAttributes;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -639,7 +638,11 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             try (Writer out = new OutputStreamWriter(new FileOutputStream(path), charset)) {
                 out.write(syntaxTextArea.getText());
             } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(parentComponent, "Unable to create the file: " + path + "\n" + e.getMessage(), "Error saving file", JOptionPane.ERROR_MESSAGE);
+                String errorMessage = "Unable to create the file: " + path + "\n" + e.getMessage();
+                if (readOnly) {
+                    errorMessage = "Unable to write to file: " + path + "\n" + e.getMessage();
+                }
+                JOptionPane.showMessageDialog(parentComponent, errorMessage, "Error saving file", JOptionPane.ERROR_MESSAGE);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(parentComponent, "Unable to save the file: " + path, "Error saving file", JOptionPane.ERROR_MESSAGE);
             }
