@@ -42,7 +42,7 @@ import org.simpleframework.xml.core.Persister;
 @Root
 public class ApplicationPreferences {
     /** Define in one spot to use everywhere */
-    public static final String FILE_PATH_SEPARATOR = System.getProperty("file.separator");
+    public static final String FILE_PATH_SEPARATOR = "/";
 
     private static final String USER_HOME = System.getProperty("user.home");
     private static final String CONFIG_FILE_NAME = "jedit_config.xml";

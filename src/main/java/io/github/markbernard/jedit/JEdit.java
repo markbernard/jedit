@@ -262,7 +262,7 @@ public class JEdit implements WindowListener, KeyListener {
     private void updateRecentDocuments() {
         fileRecentDocuments.removeAll();
         List<String> recentDocuments = applicationPreferences.getRecentDocuments();
-        if (recentDocuments.isEmpty()) {
+        if (!recentDocuments.isEmpty()) {
             int item = 0;
             for (String recentDocumentPath : recentDocuments) {
                 fileRecentDocuments.add(new JMenuItem(new FileAction.FileRecentDocumentsAction.FileRecentDocumentsOpenDocumentAction(item, recentDocumentPath, this)));
@@ -392,7 +392,7 @@ public class JEdit implements WindowListener, KeyListener {
     }
 
     private void updateReadOnly() {
-        if (readOnly) {
+        if (currentDocument.isReadOnly()) {
             readOnlyLabel.setForeground(Color.BLACK);
             readOnlyLabel.setText(Translations.getString("JEdit.updateReadOnly.readonly"));
         } else {
@@ -415,10 +415,7 @@ public class JEdit implements WindowListener, KeyListener {
 
     private void updateFilePath() {
         if (currentDocument != null) {
-            String path = currentDocument.getFilePath();
-            if (path.isEmpty()) {
-                path += "/";
-            }
+            String path = currentDocument.getFilePath() + ApplicationPreferences.FILE_PATH_SEPARATOR;
             filePathLabel.setText(path + currentDocument.getFileName());
             filePathLabel.setToolTipText(path + currentDocument.getFileName());
         }

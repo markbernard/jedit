@@ -66,6 +66,7 @@ public class ThemeDialog extends JDialog implements WindowListener {
     private transient RSyntaxTheme currentTheme;
     private transient RSyntaxTheme loadedTheme;
     private String currentExtension = "java";
+    private boolean listDialogShown = false;
     
     private final JSplitPane mainSplit;
     private JSplitPane styleSplit;
@@ -124,13 +125,16 @@ public class ThemeDialog extends JDialog implements WindowListener {
         documentTypes.sort(null);
         languageList = new JList<>(documentTypes.toArray(new String[documentTypes.size()]));
         languageList.setSelectionModel(new DefaultListSelectionModel() {
+            private static final long serialVersionUID = 2465508769282523616L;
+
             @Override
             public void setSelectionInterval(int index0, int index1) {
-                if (loadedTheme != null 
-                        && currentTheme != null 
-                        && !loadedTheme.equals(currentTheme) 
-                        && JOptionPane.showConfirmDialog(null, "Click OK to leave without saving changes.", "Abandon Changes", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                    return;
+                if (loadedTheme != null && currentTheme != null && !loadedTheme.equals(currentTheme)) {
+                    //if the dialog is shown then ListSelectionListener is only called once with valueAdjusting set to true instead of the usual twice
+                    listDialogShown = true;
+                    if (JOptionPane.showConfirmDialog(null, "Click OK to leave without saving changes.", "Abandon Changes", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                        return;
+                    }
                 }
                 super.setSelectionInterval(index0, index1);
             }
@@ -139,7 +143,8 @@ public class ThemeDialog extends JDialog implements WindowListener {
         languagePanel.add(languageList, BorderLayout.CENTER);
         languageList.setSelectedValue(currentExtension, true);
         languageList.addListSelectionListener((ListSelectionEvent e) -> {
-            if (!e.getValueIsAdjusting()) {
+            if (!e.getValueIsAdjusting() || listDialogShown) {
+                listDialogShown = false;
                 currentExtension = languageList.getSelectedValue();
                 loadTheme();
                 setThemeValues();

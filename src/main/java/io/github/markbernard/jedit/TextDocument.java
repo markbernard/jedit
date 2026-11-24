@@ -38,13 +38,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.attribute.DosFileAttributes;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,8 +88,6 @@ import io.github.markbernard.jedit.theme.ThemeManager;
  * @author Mark Bernard
  */
 public class TextDocument extends JPanel implements DocumentListener, KeyListener {
-    /** */
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final long serialVersionUID = -6937922244390572212L;
     private static final String[] NEW_LINE_CHAR = {"\n", "\r\n"};
 
@@ -384,7 +381,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @return The full path to the file.
      */
     public String getFullFilePath() {
-        return filePath.replace("/", FILE_SEPARATOR) + FILE_SEPARATOR + fileName;
+        return filePath + ApplicationPreferences.FILE_PATH_SEPARATOR + fileName;
     }
 
     /**
@@ -525,10 +522,11 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             }
             in.close();
             syntaxTextArea.setText(content.toString());
-            setLanguageInfo(DocumentFormatType.determineFormatFromFile(path.getAbsolutePath()));
-            int index = filePath.lastIndexOf(".");
+            String fullPathToFile = path.getAbsolutePath();
+            setLanguageInfo(DocumentFormatType.determineFormatFromFile(fullPathToFile));
+            int index = fullPathToFile.lastIndexOf(".");
             if (index > -1) {
-                String extension = filePath.substring(index + 1).toLowerCase();
+                String extension = fullPathToFile.substring(index + 1).toLowerCase();
                 try {
                     Theme theme = ThemeManager.loadNativeTheme(extension);
                     if (theme != null) {
@@ -540,20 +538,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             }
             undoManager.discardAllEdits();
             dirty = false;
-            readOnly = !path.canWrite();
-            if (!readOnly) {
-                FileLock lock = null;
-                try (RandomAccessFile rout = new RandomAccessFile(path, "rw")) {
-                    FileChannel channel = rout.getChannel();
-                    lock = channel.tryLock();
-                } catch (Exception e) {
-                    readOnly = true;
-                } finally {
-                    if (lock != null) {
-                        lock.release();
-                    }
-                }
-            }
+            readOnly = !path.canWrite() && !Files.isWritable(path.toPath());
             updateStatusBar(syntaxTextArea.getCaretPosition());
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Unable to find the file: " + path, "Error loading file", JOptionPane.ERROR_MESSAGE);
@@ -649,7 +634,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
 
     private void saveFile() {
         final JComponent parentComponent = this;
-        final String path = filePath + FILE_SEPARATOR + fileName;
+        final String path = filePath + ApplicationPreferences.FILE_PATH_SEPARATOR + fileName;
         SwingUtilities.invokeLater(() -> {
             try (Writer out = new OutputStreamWriter(new FileOutputStream(path), charset)) {
                 out.write(syntaxTextArea.getText());
@@ -688,7 +673,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         DirtyStatus result = DirtyStatus.DONT_SAVE_FILE;
         
         if (dirty) {
-            String saveFilePath = (fileName.equals(newFileName) ? fileName : applicationPreferences.getCurrentFilePath() + FILE_SEPARATOR + fileName);
+            String saveFilePath = (fileName.equals(newFileName) ? fileName : applicationPreferences.getCurrentFilePath() + ApplicationPreferences.FILE_PATH_SEPARATOR + fileName);
             int choice = JOptionPane.showOptionDialog(this, 
                     "Do you want to save changes to " + saveFilePath + "?", 
                     "JNotepad", 
@@ -863,6 +848,13 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             syntaxTextArea.replaceRange(syntaxTextArea.getSelectedText().toLowerCase(), selectionStart, selectionEnd);
         }
         
+    }
+
+    /**
+     * @return the readOnly
+     */
+    public boolean isReadOnly() {
+        return readOnly;
     }
 
     enum DirtyStatus {
