@@ -432,7 +432,7 @@ public class FontDialog extends BasicDialog {
         private static final String DISPLAY = "AaBbYyZz";
         private static final int WIDTH = 200;
         private static final int HEIGHT = 60;
-        private static final Dimension SIZE = new Dimension(WIDTH, HEIGHT);
+        private final Dimension SIZE = new Dimension(WIDTH, HEIGHT);
         
         private Font selectedFont;
         
