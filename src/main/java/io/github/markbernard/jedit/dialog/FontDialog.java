@@ -319,86 +319,88 @@ public class FontDialog extends BasicDialog {
         fontStyleDocumentListener = new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
-                checkText();
+                checkStyleText();
             }
             
             @Override
             public void insertUpdate(DocumentEvent e) {
-                checkText();
+                checkStyleText();
             }
             
             @Override
             public void changedUpdate(DocumentEvent e) {
-                checkText();
-            }
-            private void checkText() {
-                new Thread(() -> {
-                    ListSelectionListener[] currentListeners = 
-                            fontStyleList.getListSelectionListeners();
-                    for (ListSelectionListener currentListener : currentListeners) {
-                        fontStyleList.removeListSelectionListener(currentListener);
-                    }
-                    fontStyleList.clearSelection();
-                    String textToCheck = fontStyleField.getText();
-                    for (int i=0;i<STYLES.length;i++) {
-                        if (STYLES[i].equalsIgnoreCase(textToCheck)) {
-                            fontStyleList.setSelectedValue(STYLES[i], true);
-                            currentFontStyle = i;
-                            break;
-                        }
-                    }
-                    updateFont();
-                    for (ListSelectionListener currentListener : currentListeners) {
-                        fontStyleList.addListSelectionListener(currentListener);
-                    }
-                }, "Font Style Typing").start();
+                checkStyleText();
             }
         };
     }
 
+    private void checkStyleText() {
+        new Thread(() -> {
+            ListSelectionListener[] currentListeners = 
+                    fontStyleList.getListSelectionListeners();
+            for (ListSelectionListener currentListener : currentListeners) {
+                fontStyleList.removeListSelectionListener(currentListener);
+            }
+            fontStyleList.clearSelection();
+            String textToCheck = fontStyleField.getText();
+            for (int i=0;i<STYLES.length;i++) {
+                if (STYLES[i].equalsIgnoreCase(textToCheck)) {
+                    fontStyleList.setSelectedValue(STYLES[i], true);
+                    currentFontStyle = i;
+                    break;
+                }
+            }
+            updateFont();
+            for (ListSelectionListener currentListener : currentListeners) {
+                fontStyleList.addListSelectionListener(currentListener);
+            }
+        }, "Font Style Typing").start();
+    }
+    
     private void setupFontSizeDocumentListener() {
         fontSizeDocumentListener = new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
-                checkText();
+                checkSizeText();
             }
             
             @Override
             public void insertUpdate(DocumentEvent e) {
-                checkText();
+                checkSizeText();
             }
             
             @Override
             public void changedUpdate(DocumentEvent e) {
-                checkText();
-            }
-            private void checkText() {
-                new Thread(() -> {
-                    ListSelectionListener[] currentListeners = fontSizeList.getListSelectionListeners();
-                    for (ListSelectionListener currentListener : currentListeners) {
-                        fontSizeList.removeListSelectionListener(currentListener);
-                    }
-                    fontSizeList.clearSelection();
-                    String textToCheck = fontSizeField.getText();
-                    for (String size : SIZES) {
-                        if (size.equalsIgnoreCase(textToCheck) || size.startsWith(textToCheck)) {
-                            fontSizeList.setSelectedValue(size, true);
-                            fontSizeList.clearSelection();
-                            break;
-                        }
-                    }
-                    if (!textToCheck.isEmpty()) {
-                        currentFontSize = Integer.parseInt(textToCheck);
-                    }
-                    updateFont();
-                    for (ListSelectionListener currentListener : currentListeners) {
-                        fontSizeList.addListSelectionListener(currentListener);
-                    }
-                }, "Font Size Typing").start();
+                checkSizeText();
             }
         };
     }
     
+    private void checkSizeText() {
+        new Thread(() -> {
+            ListSelectionListener[] currentListeners = fontSizeList.getListSelectionListeners();
+            for (ListSelectionListener currentListener : currentListeners) {
+                fontSizeList.removeListSelectionListener(currentListener);
+            }
+            fontSizeList.clearSelection();
+            String textToCheck = fontSizeField.getText();
+            for (String size : SIZES) {
+                if (size.equalsIgnoreCase(textToCheck) || size.startsWith(textToCheck)) {
+                    fontSizeList.setSelectedValue(size, true);
+                    fontSizeList.clearSelection();
+                    break;
+                }
+            }
+            if (!textToCheck.isEmpty()) {
+                currentFontSize = Integer.parseInt(textToCheck);
+            }
+            updateFont();
+            for (ListSelectionListener currentListener : currentListeners) {
+                fontSizeList.addListSelectionListener(currentListener);
+            }
+        }, "Font Size Typing").start();
+    }
+
     private void updateFont() {
         fontSample.updateFont(new Font(currentFontFamily, currentFontStyle, currentFontSize));
     }
@@ -432,7 +434,7 @@ public class FontDialog extends BasicDialog {
         private static final String DISPLAY = "AaBbYyZz";
         private static final int WIDTH = 200;
         private static final int HEIGHT = 60;
-        private final Dimension SIZE = new Dimension(WIDTH, HEIGHT);
+        private final Dimension size = new Dimension(WIDTH, HEIGHT);
         
         private Font selectedFont;
         
@@ -451,7 +453,7 @@ public class FontDialog extends BasicDialog {
 
         @Override
         public Dimension getPreferredSize() {
-            return SIZE;
+            return size;
         }
         
         public void updateFont(Font font) {
