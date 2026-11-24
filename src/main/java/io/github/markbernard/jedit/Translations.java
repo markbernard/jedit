@@ -15,6 +15,8 @@ import java.util.ResourceBundle;
 public class Translations {
     private static ResourceBundle bundle = null;
     
+    private Translations() {}
+    
     /**
      * @param key
      * @return the language string for the given key

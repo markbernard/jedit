@@ -46,7 +46,9 @@ import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
@@ -91,15 +93,13 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final long serialVersionUID = -6937922244390572212L;
     private static final String[] NEW_LINE_CHAR = {"\n", "\r\n"};
-//    private static final String[] REGEX_NEW_LINE_CHAR = {"\\n", "\\r\\n"};
 
     
-    private JEdit jNotepad;
+    private final transient JEdit jEdit;
     private RSyntaxTextArea syntaxTextArea;
     private RTextScrollPane textScrollPane;
     private LanguageInfo languageInfo;
-    private int newLineTypeUsed = 0;
-//    private int newLineTypeNotUsed = 1;
+    private final int newLineTypeUsed = 0;
 
     private String newFileName = "";
     private String fileName;
@@ -107,17 +107,16 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private boolean dirty;
     private boolean readOnly;
     private RUndoManager undoManager;
-    private Charset charset;
-    private Point caratPosition;
+    private transient Charset charset;
 
-    private ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
+    private final transient ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
     
     /**
      * @param jNotepad 
      * @param documentNumber Number to place beside new in the new file name.
      */
     public TextDocument(JEdit jNotepad, int documentNumber) {
-        this.jNotepad = jNotepad;
+        this.jEdit = jNotepad;
         newFileName = "new " + documentNumber;
         fileName = newFileName;
         charset = StandardCharsets.UTF_8;
@@ -130,7 +129,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @param file Full path to the file
      */
     public TextDocument(JEdit jNotepad, File file) {
-        this.jNotepad = jNotepad;
+        this.jEdit = jNotepad;
         parseFileName(file.getAbsolutePath().replace("\\", "/"));
         createGui();
         loadFile(file);
@@ -151,10 +150,10 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                 updateStatusBar(e.getDot());
             }
         });
-        syntaxTextArea.addKeyListener(jNotepad);
+        syntaxTextArea.addKeyListener(jEdit);
         syntaxTextArea.addKeyListener(this);
         updateStatusBar(syntaxTextArea.getCaretPosition());
-        syntaxTextArea.addKeyListener(jNotepad);
+        syntaxTextArea.addKeyListener(jEdit);
         syntaxTextArea.addKeyListener(this);
         undoManager = syntaxTextArea.getUndoManager();
         syntaxTextArea.setFont(applicationPreferences.getCurrentFont());
@@ -276,7 +275,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                     (!matchCase && findTerm.equalsIgnoreCase(selectedText))) {
                 syntaxTextArea.replaceSelection(replaceTerm);
                 syntaxTextArea.setSelectionStart(syntaxTextArea.getSelectionEnd());
-                jNotepad.findNext();
+                jEdit.findNext();
             }
         }
     }
@@ -304,7 +303,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @param parentFrame 
      */
     public void goTo(JFrame parentFrame) {
-        GoToDialog goToDialog = new GoToDialog(parentFrame, jNotepad);
+        GoToDialog goToDialog = new GoToDialog(parentFrame);
         if (goToDialog.showDialog()) {
             int lineNumber = goToDialog.getLineNumber();
             
@@ -432,8 +431,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private void updateStatusBar(int position) {
         try {
             //solution for row and column from http://java-sl.com/tip_row_column.html
-            caratPosition = calculatePosition(position);
-            jNotepad.updateStatusBar(String.format("Ln %d, Col %d", caratPosition.y, caratPosition.x));
+            Point caratPosition = calculatePosition(position);
+            jEdit.updateStatusBar(String.format("Ln %d, Col %d", caratPosition.y, caratPosition.x));
         } catch (Exception e) {
             //not critical if the position in the
             //status bar does not get updated.
@@ -470,8 +469,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @param length
      */
     public void processInsert(int position, int length) {
-        if (!jNotepad.isInsertMode()) {
-            jNotepad.setInsertMode(true);
+        if (!jEdit.isInsertMode()) {
+            jEdit.setInsertMode(true);
             Document document = syntaxTextArea.getDocument();
             try {
                 int trimLength = length;
@@ -484,7 +483,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
-            jNotepad.setInsertMode(false);
+            jEdit.setInsertMode(false);
         }
     }
 
@@ -506,14 +505,12 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             if (charset.equals(StandardCharsets.ISO_8859_1)) {
                 charset = StandardCharsets.UTF_8;
             }
-            if (EncodingType.supportedEncodings.contains(charset)) {
-                if (!EncodingType.encodingAliasMap.containsKey(charset)) {
-                    for (Charset charsetForAlias : EncodingType.encodingAliasMap.keySet()) {
-                        Set<String> alias = EncodingType.encodingAliasMap.get(charsetForAlias);
-                        if (alias.contains(charsetForAlias.name())) {
-                            charset = charsetForAlias;
-                            break;
-                        }
+            Map<Charset, Set<String>> encodingAliasMap = EncodingType.getEncodingAliasMap();
+            if (EncodingType.getSupportedEncodings().contains(charset) && !encodingAliasMap.containsKey(charset)) {
+                for (Entry<Charset, Set<String>> entry : encodingAliasMap.entrySet()) {
+                    if (entry.getValue().contains(entry.getKey().name())) {
+                        charset = entry.getKey();
+                        break;
                     }
                 }
             }
@@ -523,7 +520,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             String line = null;
             BufferedReader reader = new BufferedReader(in);
             while ((line = reader.readLine()) != null) {
-                content.append(line + NEW_LINE_CHAR[newLineTypeUsed]);
+                content.append(line);
+                content.append(NEW_LINE_CHAR[newLineTypeUsed]);
             }
             in.close();
             syntaxTextArea.setText(content.toString());
@@ -544,10 +542,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             dirty = false;
             readOnly = !path.canWrite();
             if (!readOnly) {
-                RandomAccessFile rout = null;
                 FileLock lock = null;
-                try {
-                    rout = new RandomAccessFile(path, "rw");
+                try (RandomAccessFile rout = new RandomAccessFile(path, "rw")) {
                     FileChannel channel = rout.getChannel();
                     lock = channel.tryLock();
                 } catch (Exception e) {
@@ -556,7 +552,6 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                     if (lock != null) {
                         lock.release();
                     }
-                    ResourceCleanup.close(rout);
                 }
             }
             updateStatusBar(syntaxTextArea.getCaretPosition());
@@ -621,8 +616,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         boolean result = true;
         
         if (checkEncoding()) {
-            String filePath = applicationPreferences.getCurrentFilePath();
-            JFileChooser fileChooser = new JFileChooser(filePath);
+            String lastFilePath = applicationPreferences.getCurrentFilePath();
+            JFileChooser fileChooser = new JFileChooser(lastFilePath);
             if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 String selectedFilePath = selectedFile.getAbsolutePath().replace("\\", "/");
@@ -639,15 +634,13 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     }
     
     private boolean checkEncoding() {
-        boolean encodingOk = EncodingType.encodingAliasMap.containsKey(charset);
+        boolean encodingOk = EncodingType.getEncodingAliasMap().containsKey(charset);
 
-        if (!encodingOk) {
-            if (JOptionPane.showConfirmDialog(this, "<html><p>The current encoding (<b>" + charset.displayName() + "</b>) is not supported for saving.</p><p>To continue saving you must select a new encoding.</p><p>Click <b>OK</b> to change encodings.</p><p>Click <b>Cancel</b> to not save the current changes.</p><html>", "Invalid Encoding", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
-                EncodingDialog encodingDialog = new EncodingDialog(jNotepad.getParentFrame(), charset);
-                if (encodingDialog.showDialog()) {
-                    encodingOk = true;
-                    charset = encodingDialog.getCharset();
-                }
+        if (!encodingOk && JOptionPane.showConfirmDialog(this, "<html><p>The current encoding (<b>" + charset.displayName() + "</b>) is not supported for saving.</p><p>To continue saving you must select a new encoding.</p><p>Click <b>OK</b> to change encodings.</p><p>Click <b>Cancel</b> to not save the current changes.</p><html>", "Invalid Encoding", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION) {
+            EncodingDialog encodingDialog = new EncodingDialog(jEdit.getParentFrame(), charset);
+            if (encodingDialog.showDialog()) {
+                encodingOk = true;
+                charset = encodingDialog.getCharset();
             }
         }
         
@@ -657,21 +650,13 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private void saveFile() {
         final JComponent parentComponent = this;
         final String path = filePath + FILE_SEPARATOR + fileName;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Writer out = null;
-                
-                try {
-                    out = new OutputStreamWriter(new FileOutputStream(path), charset);
-                    out.write(syntaxTextArea.getText());
-                } catch (FileNotFoundException e) {
-                    JOptionPane.showMessageDialog(parentComponent, "Unable to create the file: " + path + "\n" + e.getMessage(), "Error saving file", JOptionPane.ERROR_MESSAGE);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(parentComponent, "Unable to save the file: " + path, "Error saving file", JOptionPane.ERROR_MESSAGE);
-                } finally {
-                    ResourceCleanup.close(out);
-                }
+        SwingUtilities.invokeLater(() -> {
+            try (Writer out = new OutputStreamWriter(new FileOutputStream(path), charset)) {
+                out.write(syntaxTextArea.getText());
+            } catch (FileNotFoundException e) {
+                JOptionPane.showMessageDialog(parentComponent, "Unable to create the file: " + path + "\n" + e.getMessage(), "Error saving file", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(parentComponent, "Unable to save the file: " + path, "Error saving file", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -692,7 +677,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             saveCompleted = save();
         } else if (status.equals(DirtyStatus.DONT_SAVE_FILE)) {
             saveCompleted = true;
-        } else if (status.equals(DirtyStatus.CANCEL_ACTION)) {// || (isLast && status.equals(DirtyStatus.DONT_SAVE_FILE) && fileName.equals(newFileName) && !dirty)) {
+        } else if (status.equals(DirtyStatus.CANCEL_ACTION)) {
             saveCompleted = false;
         }
         
@@ -703,9 +688,9 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         DirtyStatus result = DirtyStatus.DONT_SAVE_FILE;
         
         if (dirty) {
-            String filePath = (fileName.equals(newFileName) ? fileName : applicationPreferences.getCurrentFilePath() + FILE_SEPARATOR + fileName);
+            String saveFilePath = (fileName.equals(newFileName) ? fileName : applicationPreferences.getCurrentFilePath() + FILE_SEPARATOR + fileName);
             int choice = JOptionPane.showOptionDialog(this, 
-                    "Do you want to save changes to " + filePath + "?", 
+                    "Do you want to save changes to " + saveFilePath + "?", 
                     "JNotepad", 
                     JOptionPane.YES_NO_CANCEL_OPTION, 
                     JOptionPane.PLAIN_MESSAGE,
@@ -823,10 +808,14 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        /** not used */
+    }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+        /** not used */
+    }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
@@ -846,7 +835,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private void documentUpdated() {
         if (!dirty) {
             dirty = true;
-            jNotepad.setTitle();
+            jEdit.setTitle();
         }
         repaint();
     }

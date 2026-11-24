@@ -45,6 +45,7 @@ public class HelpAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        /** provides menu controls but needs no action */
     }
     
     /**
@@ -52,7 +53,7 @@ public class HelpAction extends AbstractAction {
      */
     public static class ViewHelpAction extends AbstractAction {
         private static final long serialVersionUID = -1640517285601598321L;
-        private JEdit jEdit;
+        private final transient JEdit jEdit;
 
         /**
          * @param jEdit
@@ -68,12 +69,7 @@ public class HelpAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-//                    jEdit.help();
-                }
-            }, Translations.getString("HelpAction.ViewHelpAction.constuctor.viewhelp")).start();
+            new Thread(jEdit::help, "Help").start();
         }
     }
 
@@ -83,7 +79,7 @@ public class HelpAction extends AbstractAction {
      */
     public static class AboutAction extends AbstractAction {
         private static final long serialVersionUID = -1640517285601598321L;
-        private JEdit jEdit;
+        private final transient JEdit jEdit;
 
         /**
          * @param jEdit
@@ -98,12 +94,7 @@ public class HelpAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jEdit.about();
-                }
-            }, Translations.getString("HelpAction.AboutAction.constuctor.about")).start();
+            new Thread(jEdit::about, "About").start();
         }
     }
 }

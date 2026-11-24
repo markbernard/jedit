@@ -48,6 +48,7 @@ public class FileAction extends AbstractAction {
     
     @Override
     public void actionPerformed(ActionEvent arg0) {
+        /** provides menu controls but needs no action */
     }
 
     /**
@@ -57,15 +58,15 @@ public class FileAction extends AbstractAction {
      */
     public static class NewAction extends AbstractAction {
         private static final long serialVersionUID = 8935736532927739892L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the New menu item.
          * 
-         * @param jNotepad Access to the application to perform actions. 
+         * @param jEdit Access to the application to perform actions. 
          */
-        public NewAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public NewAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "New");
@@ -76,12 +77,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.newDocument();
-                }
-            }, "New Document").start();
+            new Thread(jEdit::newDocument, "New Document").start();
         }
     }
 
@@ -92,15 +88,15 @@ public class FileAction extends AbstractAction {
      */
     public static class OpenAction extends AbstractAction {
         private static final long serialVersionUID = 3954227951651230619L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Open menu item.
          * 
-         * @param jNotepad Access to the application to perform actions. 
+         * @param jEdit Access to the application to perform actions. 
          */
-        public OpenAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public OpenAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "Open...");
@@ -111,12 +107,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.load();
-                }
-            }, "Open").start();
+            new Thread(jEdit::load, "Open").start();
         }
     }
 
@@ -127,15 +118,15 @@ public class FileAction extends AbstractAction {
      */
     public static class SaveAction extends AbstractAction {
         private static final long serialVersionUID = 980383255637754695L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Save menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public SaveAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public SaveAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "Save");
@@ -146,12 +137,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.save();
-                }
-            }, "Save").start();
+            new Thread(jEdit::save, "Save").start();
         }
     }
 
@@ -162,15 +148,15 @@ public class FileAction extends AbstractAction {
      */
     public static class SaveAsAction extends AbstractAction {
         private static final long serialVersionUID = 8295016518814119408L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Save As menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public SaveAsAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public SaveAsAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, 5);
             putValue(Action.NAME, "Save As...");
@@ -181,12 +167,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.saveAs();
-                }
-            }, "Save As Thread").start();
+            new Thread(jEdit::saveAs, "Save As").start();
         }
     }
 
@@ -197,15 +178,15 @@ public class FileAction extends AbstractAction {
      */
     public static class PageSetupAction extends AbstractAction {
         private static final long serialVersionUID = -6577539419280079060L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Page Setup menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public PageSetupAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public PageSetupAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(Action.NAME, "Page Setup...");
             putValue(Action.SHORT_DESCRIPTION, "Edit printer page settings.");
@@ -215,12 +196,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-//                    jNotepad.pageSetup();
-                }
-            }, "Page Setup").start();
+            new Thread(jEdit::pageSetup, "Page Setup").start();
         }
     }
 
@@ -231,15 +207,15 @@ public class FileAction extends AbstractAction {
      */
     public static class PrintAction extends AbstractAction {
         private static final long serialVersionUID = -6449830362022451492L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Print menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public PrintAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public PrintAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "Print...");
@@ -250,12 +226,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-//                    jNotepad.doPrint();
-                }
-            }, "Print").start();
+            new Thread(jEdit::doPrint, "Print").start();
         }
     }
 
@@ -266,15 +237,15 @@ public class FileAction extends AbstractAction {
      */
     public static class ExitAction extends AbstractAction {
         private static final long serialVersionUID = -3795345737189627905L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Exit menu item.
          * 
-         * @param jNotepad Access to the application to perform actions. 
+         * @param jEdit Access to the application to perform actions. 
          */
-        public ExitAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public ExitAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
             putValue(Action.NAME, "Exit");
             putValue(Action.SHORT_DESCRIPTION, "Exit JNotepad.");
@@ -284,12 +255,7 @@ public class FileAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.exit();
-                }
-            }, "Exit").start();
+            new Thread(jEdit::exit, "Exit").start();
         }
     }
     
@@ -310,6 +276,7 @@ public class FileAction extends AbstractAction {
         }
         @Override
         public void actionPerformed(ActionEvent arg0) {
+            /** provides menu controls but needs no action */
         }
         
         /**
@@ -320,19 +287,19 @@ public class FileAction extends AbstractAction {
         public static class FileRecentDocumentsOpenDocumentAction extends AbstractAction {
             private static final long serialVersionUID = -8560848798824824961L;
 
-            private String filePath;
-            private JEdit jNotepad;
+            private final String filePath;
+            private final transient JEdit jEdit;
 
             /**
              * Set up values appropriate to the selected document menu item.
              * 
              * @param item
              * @param filePath
-             * @param jNotepad
+             * @param jEdit
              */
-            public FileRecentDocumentsOpenDocumentAction(int item, String filePath, JEdit jNotepad) {
+            public FileRecentDocumentsOpenDocumentAction(int item, String filePath, JEdit jEdit) {
                 this.filePath = filePath;
-                this.jNotepad = jNotepad;
+                this.jEdit = jEdit;
                 if (item != -1) {
                     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_1 + item);
                     putValue(Action.NAME, (item + 1) + ". " + filePath);
@@ -344,11 +311,8 @@ public class FileAction extends AbstractAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        jNotepad.openRecentDocument(filePath);
-                    }
+                new Thread(() -> {
+                    jEdit.openRecentDocument(filePath);
                 }, "Open " + filePath).start();
             }
         }

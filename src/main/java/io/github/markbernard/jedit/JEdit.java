@@ -242,7 +242,7 @@ public class JEdit implements WindowListener, KeyListener {
         }
         JMenu encodingMenu = new JMenu(new DocumentAction.EncodingAction());
         documentMenu.add(encodingMenu);
-        for (Charset charset : EncodingType.supportedEncodings) {
+        for (Charset charset : EncodingType.getSupportedEncodings()) {
             JMenuItem charsetMenuItem = new JMenuItem(new DocumentAction.EncodingAction.CharsetAction(this, charset));
             encodingMenu.add(charsetMenuItem);
         }
@@ -761,6 +761,25 @@ public class JEdit implements WindowListener, KeyListener {
             aboutDialog.setVisible(true);
         });
     }
+
+    /**
+     * 
+     */
+    public void pageSetup() {
+        //TODO implement
+    }
+
+    /**
+     * 
+     */
+    public void doPrint() {
+        //TODO implement
+    }
+
+    public void help() {
+        //TODO implement
+    }
+
     /**
      * Exit while saving prefrenecs and checking if save is required.
      */

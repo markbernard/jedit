@@ -23,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
@@ -32,9 +31,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.text.PlainDocument;
-
-import io.github.markbernard.jedit.JEdit;
 
 /**
  * @author Mark Bernard
@@ -42,16 +38,15 @@ import io.github.markbernard.jedit.JEdit;
 public class GoToDialog extends BasicDialog {
     private static final long serialVersionUID = -6782369683523682953L;
     
-    private JTextField lineNumberText;
+    private final JTextField lineNumberText;
     private boolean performGoto = false;
 
     /**
      * Set up GUI
      * 
      * @param frame 
-     * @param jNotepad 
      */
-    public GoToDialog(JFrame frame, JEdit jNotepad) {
+    public GoToDialog(JFrame frame) {
         super(frame, "Go To Line", true);
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -70,7 +65,6 @@ public class GoToDialog extends BasicDialog {
         inputPanel.add(lineNumberText);
         lineNumberLabel.setLabelFor(lineNumberText);
         lineNumberLabel.setDisplayedMnemonic(KeyEvent.VK_L);
-//        ((PlainDocument)lineNumberText.getDocument()).setDocumentFilter(new NumberDocumentFilter());
         lineNumberText.setSelectionStart(0);
         lineNumberText.setSelectionEnd(1);
         
@@ -88,20 +82,14 @@ public class GoToDialog extends BasicDialog {
         addEscapeToActionMap(cancelButton);
         buttonPanel.add(cancelButton);
         
-        goToButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                performGoto = true;
-                setVisible(false);
-            }
+        goToButton.addActionListener((ActionEvent e) -> {
+            performGoto = true;
+            setVisible(false);
         });
         
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                performGoto = false;
-                setVisible(false);
-            }
+        cancelButton.addActionListener((ActionEvent e) -> {
+            performGoto = false;
+            setVisible(false);
         });
     }
     

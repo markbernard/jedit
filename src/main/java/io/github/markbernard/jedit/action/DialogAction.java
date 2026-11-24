@@ -36,6 +36,9 @@ import io.github.markbernard.jedit.dialog.SearchDialog;
  * @author Mark Bernard
  */
 public class DialogAction {
+
+    private DialogAction() {}
+
     /**
      * @author Mark Bernard
      */
@@ -53,6 +56,7 @@ public class DialogAction {
         
         @Override
         public void actionPerformed(ActionEvent arg0) {
+            /** provides menu controls but needs no action */
         }
         
     }
@@ -62,15 +66,15 @@ public class DialogAction {
      */
     public static class ReplaceAction extends AbstractAction {
         private static final long serialVersionUID = 4675522254419238324L;
-        private JEdit jNotepad;
-        private SearchDialog searchDialog;
+        private final transient JEdit jEdit;
+        private final SearchDialog searchDialog;
 
         /**
-         * @param jNotepad 
+         * @param jEdit 
          * @param searchDialog 
          */
-        public ReplaceAction(JEdit jNotepad, SearchDialog searchDialog) {
-            this.jNotepad = jNotepad;
+        public ReplaceAction(JEdit jEdit, SearchDialog searchDialog) {
+            this.jEdit = jEdit;
             this.searchDialog = searchDialog;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
             putValue(NAME, Translations.getString("DialogAction.ReplaceAction.constuctor.replace"));
@@ -78,14 +82,11 @@ public class DialogAction {
         
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.setFindTerm(searchDialog.getFindTerm());
-                    jNotepad.setReplaceTerm(searchDialog.getReplaceTerm());
-                    jNotepad.setMatchCase(searchDialog.isMatchCase());
-                    jNotepad.performReplace();
-                }
+            new Thread(() -> {
+                jEdit.setFindTerm(searchDialog.getFindTerm());
+                jEdit.setReplaceTerm(searchDialog.getReplaceTerm());
+                jEdit.setMatchCase(searchDialog.isMatchCase());
+                jEdit.performReplace();
             }, Translations.getString("DialogAction.ReplaceAction.actionPerformed.replacedialog")).start();
         }
     }
@@ -95,15 +96,15 @@ public class DialogAction {
      */
     public static class ReplaceAllAction extends AbstractAction {
         private static final long serialVersionUID = 4675522254419238324L;
-        private JEdit jNotepad;
-        private SearchDialog searchDialog;
+        private final transient JEdit jEdit;
+        private final SearchDialog searchDialog;
 
         /**
-         * @param jNotepad 
+         * @param jEdit 
          * @param searchDialog 
          */
-        public ReplaceAllAction(JEdit jNotepad, SearchDialog searchDialog) {
-            this.jNotepad = jNotepad;
+        public ReplaceAllAction(JEdit jEdit, SearchDialog searchDialog) {
+            this.jEdit = jEdit;
             this.searchDialog = searchDialog;
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(DISPLAYED_MNEMONIC_INDEX_KEY, 8);
@@ -112,14 +113,11 @@ public class DialogAction {
         
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.setFindTerm(searchDialog.getFindTerm());
-                    jNotepad.setReplaceTerm(searchDialog.getReplaceTerm());
-                    jNotepad.setMatchCase(searchDialog.isMatchCase());
-                    jNotepad.replaceAll();
-                }
+            new Thread(() -> {
+                jEdit.setFindTerm(searchDialog.getFindTerm());
+                jEdit.setReplaceTerm(searchDialog.getReplaceTerm());
+                jEdit.setMatchCase(searchDialog.isMatchCase());
+                jEdit.replaceAll();
             }, Translations.getString("DialogAction.ReplaceAllAction.replaceall")).start();
         }
     }
@@ -129,7 +127,7 @@ public class DialogAction {
      */
     public static class CancelAction extends AbstractAction {
         private static final long serialVersionUID = 4675522254419238324L;
-        private JDialog dialog;
+        private final JDialog dialog;
 
         /**
          * @param dialog 

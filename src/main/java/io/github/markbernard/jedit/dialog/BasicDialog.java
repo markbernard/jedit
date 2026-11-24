@@ -26,12 +26,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
-import io.github.markbernard.jedit.ResourceCleanup;
 import io.github.markbernard.jedit.action.DialogAction;
 
 /**
@@ -46,7 +46,7 @@ public abstract class BasicDialog extends JDialog implements WindowListener {
      * @param title
      * @param modal
      */
-    public BasicDialog(Frame owner, String title, boolean modal) {
+    protected BasicDialog(Frame owner, String title, boolean modal) {
         super(owner, title, modal);
     }
 
@@ -74,11 +74,10 @@ public abstract class BasicDialog extends JDialog implements WindowListener {
     protected String loadTextFromResource(String ref) {
         String result = "";
         
-        Reader in = null;
-        try {
-            in = new InputStreamReader(getClass().getResourceAsStream(ref), "UTF-8");
+        try (Reader in = new InputStreamReader(getClass().getResourceAsStream(ref), StandardCharsets.UTF_8)) {
+            
             StringBuilder content = new StringBuilder();
-            char buffer[] = new char[16384];
+            char[] buffer = new char[16384];
             int read = -1;
             while ((read = in.read(buffer)) > -1) {
                 content.append(buffer, 0, read);
@@ -87,10 +86,7 @@ public abstract class BasicDialog extends JDialog implements WindowListener {
         } catch (Exception e) {
             //should not occur since we are dealing with a local resource
             e.printStackTrace();
-        } finally {
-            ResourceCleanup.close(in);
         }
-        
         
         return result;
     }

@@ -27,7 +27,6 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -47,7 +46,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
 
 /**
  * Dialog to allow the user to select the font they want.
@@ -59,19 +57,19 @@ public class FontDialog extends BasicDialog {
     private static final String[] STYLES = {"Plain", "Bold", "Italic", "Bold Italic"};
     private static final String[] SIZES = {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
     
-    private JList<String> fontFamilyList;
-    private JList<String> fontStyleList;
-    private JList<String> fontSizeList;
+    private final JList<String> fontFamilyList;
+    private final JList<String> fontStyleList;
+    private final JList<String> fontSizeList;
     
-    private JTextField fontFamilyField;
-    private JTextField fontStyleField;
-    private JTextField fontSizeField;
+    private final JTextField fontFamilyField;
+    private final JTextField fontStyleField;
+    private final JTextField fontSizeField;
     
-    private DocumentListener fontFamilyDocumentListener;
-    private DocumentListener fontStyleDocumentListener;
-    private DocumentListener fontSizeDocumentListener;
+    private transient DocumentListener fontFamilyDocumentListener;
+    private transient DocumentListener fontStyleDocumentListener;
+    private transient DocumentListener fontSizeDocumentListener;
     
-    private FontSample fontSample;
+    private final FontSample fontSample;
     
     private String currentFontFamily;
     private int currentFontStyle;
@@ -140,7 +138,6 @@ public class FontDialog extends BasicDialog {
         fontSizeLabel.setLabelFor(fontSizeField);
         fontSizeLabel.setDisplayedMnemonic(KeyEvent.VK_S);
         addEscapeToActionMap(fontSizeField);
-//        ((PlainDocument) fontSizeField.getDocument()).setDocumentFilter(new NumberDocumentFilter());
         fontSizeList = new JList<String>(SIZES);
         addEscapeToActionMap(fontSizeList);
         JScrollPane fontSizePane = new JScrollPane(fontSizeList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -175,20 +172,14 @@ public class FontDialog extends BasicDialog {
         fontStyleList.setSelectedValue(STYLES[currentFontStyle], true);
         fontSizeList.setSelectedValue(String.valueOf(currentFontSize), true);
         
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancelled = false;
-                setVisible(false);
-            }
+        okButton.addActionListener((ActionEvent e) -> {
+            cancelled = false;
+            setVisible(false);
         });
         
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancelled = true;
-                setVisible(false);
-            }
+        cancelButton.addActionListener((ActionEvent e) -> {
+            cancelled = true;
+            setVisible(false);
         });
         
         addListEvents();
@@ -196,62 +187,44 @@ public class FontDialog extends BasicDialog {
     }
     
     private void addListEvents() {
-        fontFamilyList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        currentFontFamily = (String)fontFamilyList.getSelectedValue();
-                        Document doc = fontFamilyField.getDocument();
-                        doc.removeDocumentListener(fontFamilyDocumentListener);
-                        fontFamilyField.setText(currentFontFamily);
-                        doc.addDocumentListener(fontFamilyDocumentListener);
-                        updateFont();
-                    }
-                }, "Font Family Select").start();
-            }
+        fontFamilyList.addListSelectionListener((ListSelectionEvent e) -> {
+            new Thread(() -> {
+                currentFontFamily = fontFamilyList.getSelectedValue();
+                Document doc = fontFamilyField.getDocument();
+                doc.removeDocumentListener(fontFamilyDocumentListener);
+                fontFamilyField.setText(currentFontFamily);
+                doc.addDocumentListener(fontFamilyDocumentListener);
+                updateFont();
+            }, "Font Family Select").start();
         });
         
-        fontStyleList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String styleName = (String)fontStyleList.getSelectedValue();
-                        currentFontStyle = 0;
-                        for (currentFontStyle = 0;currentFontStyle < STYLES.length;
-                                currentFontStyle++) {
-                            if (styleName.equals(STYLES[currentFontStyle])) {
-                                break;
-                            }
-                        }
-                        Document doc = fontStyleField.getDocument();
-                        doc.removeDocumentListener(fontStyleDocumentListener);
-                        fontStyleField.setText(STYLES[currentFontStyle]);
-                        doc.addDocumentListener(fontStyleDocumentListener);
-                        updateFont();
+        fontStyleList.addListSelectionListener((ListSelectionEvent e) -> {
+            new Thread(() -> {
+                String styleName = fontStyleList.getSelectedValue();
+                currentFontStyle = 0;
+                for (currentFontStyle = 0;currentFontStyle < STYLES.length;
+                        currentFontStyle++) {
+                    if (styleName.equals(STYLES[currentFontStyle])) {
+                        break;
                     }
-                }, "Font Style Select").start();
-            }
+                }
+                Document doc = fontStyleField.getDocument();
+                doc.removeDocumentListener(fontStyleDocumentListener);
+                fontStyleField.setText(STYLES[currentFontStyle]);
+                doc.addDocumentListener(fontStyleDocumentListener);
+                updateFont();
+            }, "Font Style Select").start();
         });
 
-        fontSizeList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        currentFontSize = Integer.parseInt((String)fontSizeList.getSelectedValue());
-                        Document doc = fontSizeField.getDocument();
-                        doc.removeDocumentListener(fontSizeDocumentListener);
-                        fontSizeField.setText(String.valueOf(currentFontSize));
-                        doc.addDocumentListener(fontSizeDocumentListener);
-                        updateFont();
-                    }
-                }, "Font Size Select").start();
-            }
+        fontSizeList.addListSelectionListener((ListSelectionEvent e) -> {
+            new Thread(() -> {
+                currentFontSize = Integer.parseInt(fontSizeList.getSelectedValue());
+                Document doc = fontSizeField.getDocument();
+                doc.removeDocumentListener(fontSizeDocumentListener);
+                fontSizeField.setText(String.valueOf(currentFontSize));
+                doc.addDocumentListener(fontSizeDocumentListener);
+                updateFont();
+            }, "Font Size Select").start();
         });
     }
     
@@ -259,6 +232,7 @@ public class FontDialog extends BasicDialog {
         fontFamilyField.addFocusListener(new FocusListener() {
             @Override
             public void focusLost(FocusEvent e) {
+                /** only need focus gained */
             }
             
             @Override
@@ -270,6 +244,7 @@ public class FontDialog extends BasicDialog {
         fontStyleField.addFocusListener(new FocusListener() {
             @Override
             public void focusLost(FocusEvent e) {
+                /** only need focus gained */
             }
             
             @Override
@@ -281,6 +256,7 @@ public class FontDialog extends BasicDialog {
         fontSizeField.addFocusListener(new FocusListener() {
             @Override
             public void focusLost(FocusEvent e) {
+                /** only need focus gained */
             }
             
             @Override
@@ -289,6 +265,17 @@ public class FontDialog extends BasicDialog {
             }
         });
         
+        setupFontFamilyDocumentListener(fontFamilyNames);
+        fontFamilyField.getDocument().addDocumentListener(fontFamilyDocumentListener);
+
+        setupFontStyleDocumentListener();
+        fontStyleField.getDocument().addDocumentListener(fontStyleDocumentListener);
+
+        setupFontSizeDocumentListener();
+        fontSizeField.getDocument().addDocumentListener(fontSizeDocumentListener);
+    }
+
+    private void setupFontFamilyDocumentListener(final String[] fontFamilyNames) {
         fontFamilyDocumentListener = new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
@@ -305,38 +292,30 @@ public class FontDialog extends BasicDialog {
                 checkText();
             }
             private void checkText() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ListSelectionListener[] currentListeners = 
-                                fontFamilyList.getListSelectionListeners();
-                        for (ListSelectionListener currentListener : currentListeners) {
-                            fontFamilyList.removeListSelectionListener(currentListener);
+                new Thread(() -> {
+                    ListSelectionListener[] currentListeners = fontFamilyList.getListSelectionListeners();
+                    for (ListSelectionListener currentListener : currentListeners) {
+                        fontFamilyList.removeListSelectionListener(currentListener);
+                    }
+                    fontFamilyList.clearSelection();
+                    String textToCheck = fontFamilyField.getText();
+                    for (String fontFamilyName : fontFamilyNames) {
+                        if (fontFamilyName.equalsIgnoreCase(textToCheck) || fontFamilyName.toLowerCase().startsWith(textToCheck.toLowerCase())) {
+                            fontFamilyList.setSelectedValue(fontFamilyName, true);
+                            currentFontFamily = fontFamilyName;
+                            break;
                         }
-                        fontFamilyList.clearSelection();
-                        String textToCheck = fontFamilyField.getText();
-                        for (String fontFamilyName : fontFamilyNames) {
-                            if (fontFamilyName.equalsIgnoreCase(textToCheck)) {
-                                fontFamilyList.setSelectedValue(fontFamilyName, true);
-                                currentFontFamily = fontFamilyName;
-                                break;
-                            } else if (fontFamilyName.toLowerCase()
-                                    .startsWith(textToCheck.toLowerCase())) {
-                                fontFamilyList.setSelectedValue(fontFamilyName, true);
-                                currentFontFamily = fontFamilyName;
-                                break;
-                            }
-                        }
-                        updateFont();
-                        for (ListSelectionListener currentListener : currentListeners) {
-                            fontFamilyList.addListSelectionListener(currentListener);
-                        }
+                    }
+                    updateFont();
+                    for (ListSelectionListener currentListener : currentListeners) {
+                        fontFamilyList.addListSelectionListener(currentListener);
                     }
                 }, "Font Family Typing").start();
             }
         };
-        fontFamilyField.getDocument().addDocumentListener(fontFamilyDocumentListener);
+    }
 
+    private void setupFontStyleDocumentListener() {
         fontStyleDocumentListener = new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
@@ -353,33 +332,31 @@ public class FontDialog extends BasicDialog {
                 checkText();
             }
             private void checkText() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ListSelectionListener[] currentListeners = 
-                                fontStyleList.getListSelectionListeners();
-                        for (ListSelectionListener currentListener : currentListeners) {
-                            fontStyleList.removeListSelectionListener(currentListener);
+                new Thread(() -> {
+                    ListSelectionListener[] currentListeners = 
+                            fontStyleList.getListSelectionListeners();
+                    for (ListSelectionListener currentListener : currentListeners) {
+                        fontStyleList.removeListSelectionListener(currentListener);
+                    }
+                    fontStyleList.clearSelection();
+                    String textToCheck = fontStyleField.getText();
+                    for (int i=0;i<STYLES.length;i++) {
+                        if (STYLES[i].equalsIgnoreCase(textToCheck)) {
+                            fontStyleList.setSelectedValue(STYLES[i], true);
+                            currentFontStyle = i;
+                            break;
                         }
-                        fontStyleList.clearSelection();
-                        String textToCheck = fontStyleField.getText();
-                        for (int i=0;i<STYLES.length;i++) {
-                            if (STYLES[i].equalsIgnoreCase(textToCheck)) {
-                                fontStyleList.setSelectedValue(STYLES[i], true);
-                                currentFontStyle = i;
-                                break;
-                            }
-                        }
-                        updateFont();
-                        for (ListSelectionListener currentListener : currentListeners) {
-                            fontStyleList.addListSelectionListener(currentListener);
-                        }
+                    }
+                    updateFont();
+                    for (ListSelectionListener currentListener : currentListeners) {
+                        fontStyleList.addListSelectionListener(currentListener);
                     }
                 }, "Font Style Typing").start();
             }
         };
-        fontStyleField.getDocument().addDocumentListener(fontStyleDocumentListener);
+    }
 
+    private void setupFontSizeDocumentListener() {
         fontSizeDocumentListener = new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
@@ -396,38 +373,30 @@ public class FontDialog extends BasicDialog {
                 checkText();
             }
             private void checkText() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ListSelectionListener[] currentListeners = 
-                                fontSizeList.getListSelectionListeners();
-                        for (ListSelectionListener currentListener : currentListeners) {
-                            fontSizeList.removeListSelectionListener(currentListener);
+                new Thread(() -> {
+                    ListSelectionListener[] currentListeners = fontSizeList.getListSelectionListeners();
+                    for (ListSelectionListener currentListener : currentListeners) {
+                        fontSizeList.removeListSelectionListener(currentListener);
+                    }
+                    fontSizeList.clearSelection();
+                    String textToCheck = fontSizeField.getText();
+                    for (String size : SIZES) {
+                        if (size.equalsIgnoreCase(textToCheck) || size.startsWith(textToCheck)) {
+                            fontSizeList.setSelectedValue(size, true);
+                            fontSizeList.clearSelection();
+                            break;
                         }
-                        fontSizeList.clearSelection();
-                        String textToCheck = fontSizeField.getText();
-                        for (String size : SIZES) {
-                            if (size.equalsIgnoreCase(textToCheck)) {
-                                fontSizeList.setSelectedValue(size, true);
-                                break;
-                            } else if (size.startsWith(textToCheck)) {
-                                fontSizeList.setSelectedValue(size, true);
-                                fontSizeList.clearSelection();
-                                break;
-                            }
-                        }
-                        if (!textToCheck.isEmpty()) {
-                            currentFontSize = Integer.parseInt(textToCheck);
-                        }
-                        updateFont();
-                        for (ListSelectionListener currentListener : currentListeners) {
-                            fontSizeList.addListSelectionListener(currentListener);
-                        }
+                    }
+                    if (!textToCheck.isEmpty()) {
+                        currentFontSize = Integer.parseInt(textToCheck);
+                    }
+                    updateFont();
+                    for (ListSelectionListener currentListener : currentListeners) {
+                        fontSizeList.addListSelectionListener(currentListener);
                     }
                 }, "Font Size Typing").start();
             }
         };
-        fontSizeField.getDocument().addDocumentListener(fontSizeDocumentListener);
     }
     
     private void updateFont() {
@@ -463,17 +432,17 @@ public class FontDialog extends BasicDialog {
         private static final String DISPLAY = "AaBbYyZz";
         private static final int WIDTH = 200;
         private static final int HEIGHT = 60;
-        private final Dimension SIZE = new Dimension(WIDTH, HEIGHT);
+        private static final Dimension SIZE = new Dimension(WIDTH, HEIGHT);
         
-        private Font font;
+        private Font selectedFont;
         
         public FontSample(Font font) {
-            this.font = font;
+            this.selectedFont = font;
         }
         
         @Override
         protected void paintComponent(Graphics g) {
-            g.setFont(font);
+            g.setFont(selectedFont);
             FontMetrics fm = g.getFontMetrics();
             int x = (WIDTH - fm.stringWidth(DISPLAY)) / 2;
             int y = ((HEIGHT - fm.getHeight()) / 2) + fm.getAscent();
@@ -486,7 +455,7 @@ public class FontDialog extends BasicDialog {
         }
         
         public void updateFont(Font font) {
-            this.font = font;
+            this.selectedFont = font;
             repaint();
         }
     }

@@ -48,6 +48,7 @@ public class DocumentAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        /** provides menu controls but needs no action */
     }
 
     /**
@@ -57,16 +58,16 @@ public class DocumentAction extends AbstractAction {
         private static final long serialVersionUID = -7155740870533895459L;
         private static WordWrapAction instance;
         
-        private JEdit jNotepad;
-        private ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
+        private final transient JEdit jEdit;
+        private final transient ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
 
         /**
-         * @param jNotepad
+         * @param jEdit
          * @return Single instance
          */
-        public static WordWrapAction getInstance(JEdit jNotepad) {
+        public static WordWrapAction getInstance(JEdit jEdit) {
             if (instance == null) {
-                instance = new WordWrapAction(jNotepad);
+                instance = new WordWrapAction(jEdit);
             }
             
             return instance;
@@ -75,10 +76,10 @@ public class DocumentAction extends AbstractAction {
         /**
          * Set up values for the Word Wrap menu
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        private WordWrapAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        private WordWrapAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
             putValue(Action.NAME, Translations.getString("DialogAction.WordWrapAction.wordwrap"));
             putValue(Action.SHORT_DESCRIPTION, Translations.getString("DialogAction.WordWrapAction.constuctor.wordwrap.description"));
@@ -88,14 +89,11 @@ public class DocumentAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    applicationPreferences.setWordWrap(!applicationPreferences.isWordWrap());
-                    putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
-                    putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
-                    jNotepad.wordWrap();
-                }
+            new Thread(() -> {
+                applicationPreferences.setWordWrap(!applicationPreferences.isWordWrap());
+                putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+                putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+                jEdit.wordWrap();
             }, Translations.getString("DialogAction.WordWrapAction.wordwrap")).start();
         }
         
@@ -108,7 +106,7 @@ public class DocumentAction extends AbstractAction {
         private static final long serialVersionUID = 7931332636444460703L;
         
         /**
-         * @param jNotepad
+         * @param jEdit
          */
         public LanguageAction() {
             putValue(MNEMONIC_KEY, KeyEvent.VK_L);
@@ -117,6 +115,7 @@ public class DocumentAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            /** provides menu controls but needs no action */
         }
         
         
@@ -126,15 +125,15 @@ public class DocumentAction extends AbstractAction {
         public static class LanguageChoiceAction extends AbstractAction {
             private static final long serialVersionUID = -6070781993396455988L;
 
-            private JEdit jNotepad;
-            private LanguageInfo languageInfo;
+            private final transient JEdit jEdit;
+            private final transient LanguageInfo languageInfo;
 
             /**
-             * @param jNotepad
+             * @param jEdit
              * @param languageInfo
              */
-            public LanguageChoiceAction(JEdit jNotepad, LanguageInfo languageInfo) {
-                this.jNotepad = jNotepad;
+            public LanguageChoiceAction(JEdit jEdit, LanguageInfo languageInfo) {
+                this.jEdit = jEdit;
                 this.languageInfo = languageInfo;
                 putValue(NAME, languageInfo.getName());
             }
@@ -142,7 +141,7 @@ public class DocumentAction extends AbstractAction {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Thread(() -> {
-                    jNotepad.setLanguage(languageInfo);
+                    jEdit.setLanguage(languageInfo);
                 }, Translations.getString("DialogAction.LanguageAction.LanguageChoiceAction.actionPerformed.changelanguage", languageInfo.getName())).start();
             }
         
@@ -165,6 +164,7 @@ public class DocumentAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            /** provides menu controls but needs no action */
         }
         
         /**
@@ -173,15 +173,15 @@ public class DocumentAction extends AbstractAction {
         public static class CharsetAction extends AbstractAction {
             private static final long serialVersionUID = 8848351864190448190L;
 
-            private JEdit jNotepad;
-            private Charset charset;
+            private final transient JEdit jEdit;
+            private final transient Charset charset;
 
             /**
              * @param jNotepad
              * @param charset
              */
             public CharsetAction(JEdit jNotepad, Charset charset) {
-                this.jNotepad = jNotepad;
+                this.jEdit = jNotepad;
                 this.charset = charset;
                 putValue(NAME, charset.displayName());
             }
@@ -189,7 +189,7 @@ public class DocumentAction extends AbstractAction {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Thread(() -> {
-                    jNotepad.setCharset(charset);
+                    jEdit.setCharset(charset);
                 }, Translations.getString("DialogAction.EncodingAction.CharsetAction.actionPerformed.changeset", charset.displayName())).start();
             }
         }

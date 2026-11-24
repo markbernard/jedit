@@ -9,14 +9,11 @@ import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -24,7 +21,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -42,9 +38,7 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -66,15 +60,17 @@ import io.github.markbernard.jedit.theme.ThemeManager;
  */
 public class ThemeDialog extends JDialog implements WindowListener {
     private static final long serialVersionUID = -3171638741388684292L;
+
+    private static final String COLOR = "color";
     
-    private RSyntaxTheme currentTheme;
-    private RSyntaxTheme loadedTheme;
+    private transient RSyntaxTheme currentTheme;
+    private transient RSyntaxTheme loadedTheme;
     private String currentExtension = "java";
     
-    private JSplitPane mainSplit;
+    private final JSplitPane mainSplit;
     private JSplitPane styleSplit;
     private RSyntaxTextArea syntaxTextArea;
-    private JList<String> languageList;
+    private final JList<String> languageList;
     private JSpinner baseFontSize;
     private ColorPicker backgroundColor;
     private ColorPicker caretColor;
@@ -107,7 +103,6 @@ public class ThemeDialog extends JDialog implements WindowListener {
     private JCheckBox[] tokenStylesBold;
     private ColorPicker[] tokenStylesFg;
     private JCheckBox[] tokenStylesItalic;
-    private String[] tokenStylesToken;
 
     /**
      * @param owner 
@@ -126,15 +121,16 @@ public class ThemeDialog extends JDialog implements WindowListener {
         mainSplit.add(languageScroll, JSplitPane.LEFT);
         languageScroll.getVerticalScrollBar().setUnitIncrement(10);
         List<String> documentTypes = new ArrayList<>(DocumentFormatType.getAvailableExtensions());
-        Collections.sort(documentTypes);
+        documentTypes.sort(null);
         languageList = new JList<>(documentTypes.toArray(new String[documentTypes.size()]));
         languageList.setSelectionModel(new DefaultListSelectionModel() {
             @Override
             public void setSelectionInterval(int index0, int index1) {
-                if (loadedTheme != null && currentTheme != null && !loadedTheme.equals(currentTheme)) {
-                    if (JOptionPane.showConfirmDialog(null, "Click OK to leave without saving changes.", "Abandon Changes", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-                        return;
-                    }
+                if (loadedTheme != null 
+                        && currentTheme != null 
+                        && !loadedTheme.equals(currentTheme) 
+                        && JOptionPane.showConfirmDialog(null, "Click OK to leave without saving changes.", "Abandon Changes", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+                    return;
                 }
                 super.setSelectionInterval(index0, index1);
             }
@@ -142,15 +138,12 @@ public class ThemeDialog extends JDialog implements WindowListener {
         languageList.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 40));
         languagePanel.add(languageList, BorderLayout.CENTER);
         languageList.setSelectedValue(currentExtension, true);
-        languageList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    currentExtension = languageList.getSelectedValue();
-                    loadTheme();
-                    setThemeValues();
-                    loadSample();
-                }
+        languageList.addListSelectionListener((ListSelectionEvent e) -> {
+            if (!e.getValueIsAdjusting()) {
+                currentExtension = languageList.getSelectedValue();
+                loadTheme();
+                setThemeValues();
+                loadSample();
             }
         });
         
@@ -158,29 +151,16 @@ public class ThemeDialog extends JDialog implements WindowListener {
         add(buttonPanel, BorderLayout.SOUTH);
         JButton okButton = new JButton("Ok");
         buttonPanel.add(okButton);
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveCurrentTheme();
-                exit();
-            }
+        okButton.addActionListener((ActionEvent e) -> {
+            saveCurrentTheme();
+            exit();
         });
         JButton applyButton = new JButton("Apply");
         buttonPanel.add(applyButton);
-        applyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveCurrentTheme();
-            }
-        });
+        applyButton.addActionListener((ActionEvent e) -> saveCurrentTheme() );
         JButton cancelButton = new JButton("Cancel");
         buttonPanel.add(cancelButton);
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                exit();
-            }
-        });
+        cancelButton.addActionListener((ActionEvent e) -> exit() );
         
         loadTheme();
         createStyleSelections();
@@ -201,243 +181,177 @@ public class ThemeDialog extends JDialog implements WindowListener {
         styleSelectionsPanel.add(new JLabel("Base Font"));
         styleSelectionsPanel.add(new JLabel("size"));
         styleSelectionsPanel.add(baseFontSize);
-        baseFontSize.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
+        baseFontSize.addChangeListener((ChangeEvent e) -> {
                 currentTheme.baseFont.size = (Integer) baseFontSize.getValue();
                 applyTheme();
-            }
         });
         backgroundColor = new ColorPicker(currentTheme.background.color);
         styleSelectionsPanel.add(new JLabel("Background"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(backgroundColor);
-        backgroundColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.background.color = backgroundColor.getColorString();
-                applyTheme();
-            }
+        backgroundColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.background.color = backgroundColor.getColorString();
+            applyTheme();
         });
         caretColor = new ColorPicker(currentTheme.caret.color);
         styleSelectionsPanel.add(new JLabel("Caret"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(caretColor);
-        caretColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.caret.color = caretColor.getColorString();
-                applyTheme();
-            }
+        caretColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.caret.color = caretColor.getColorString();
+            applyTheme();
         });
         selectionBg = new ColorPicker(currentTheme.selection.bg);
         styleSelectionsPanel.add(new JLabel("Selection"));
         styleSelectionsPanel.add(new JLabel("bg"));
         styleSelectionsPanel.add(selectionBg);
-        selectionBg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.selection.bg = selectionBg.getColorString();
-                applyTheme();
-            }
+        selectionBg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.selection.bg = selectionBg.getColorString();
+            applyTheme();
         });
         selectionFg = new ColorPicker(currentTheme.selection.fg);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("fg"));
         styleSelectionsPanel.add(selectionFg);
-        selectionFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.selection.fg = selectionFg.getColorString();
-                applyTheme();
-            }
+        selectionFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.selection.fg = selectionFg.getColorString();
+            applyTheme();
         });
         selectionRoundedEdges = new JCheckBox("true", currentTheme.selection.roundedEdges);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("rounded edges"));
         styleSelectionsPanel.add(selectionRoundedEdges);
-        selectionRoundedEdges.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.selection.roundedEdges = selectionRoundedEdges.isSelected();
-                applyTheme();
-            }
+        selectionRoundedEdges.addChangeListener((ChangeEvent e) -> {
+            currentTheme.selection.roundedEdges = selectionRoundedEdges.isSelected();
+            applyTheme();
         });
         selectionUseFg = new JCheckBox("true", currentTheme.selection.useFG);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("Use FG"));
         styleSelectionsPanel.add(selectionUseFg);
-        selectionUseFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.selection.useFG = selectionUseFg.isSelected();
-                applyTheme();
-            }
+        selectionUseFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.selection.useFG = selectionUseFg.isSelected();
+            applyTheme();
         });
         currentLineHighlightColor = new ColorPicker(currentTheme.currentLineHighlight.color);
         styleSelectionsPanel.add(new JLabel("Current Line Highlight"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(currentLineHighlightColor);
-        currentLineHighlightColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.currentLineHighlight.color = currentLineHighlightColor.getColorString();
-                applyTheme();
-            }
+        currentLineHighlightColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.currentLineHighlight.color = currentLineHighlightColor.getColorString();
+            applyTheme();
         });
         currentLineHighlightFade = new JCheckBox("true", currentTheme.currentLineHighlight.fade);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("fade"));
         styleSelectionsPanel.add(currentLineHighlightFade);
-        currentLineHighlightFade.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.currentLineHighlight.fade = currentLineHighlightFade.isSelected();
-                applyTheme();
-            }
+        currentLineHighlightFade.addChangeListener((ChangeEvent e) -> {
+            currentTheme.currentLineHighlight.fade = currentLineHighlightFade.isSelected();
+            applyTheme();
         });
         tabLineColor = new ColorPicker(currentTheme.tabLine.color);
         styleSelectionsPanel.add(new JLabel("Tab Line"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(tabLineColor);
-        tabLineColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.tabLine.color = tabLineColor.getColorString();
-                applyTheme();
-            }
+        tabLineColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.tabLine.color = tabLineColor.getColorString();
+            applyTheme();
         });
         marginLineFg = new ColorPicker(currentTheme.marginLine.fg);
         styleSelectionsPanel.add(new JLabel("Margin Line"));
         styleSelectionsPanel.add(new JLabel("fg"));
         styleSelectionsPanel.add(marginLineFg);
-        marginLineFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.marginLine.fg = marginLineFg.getColorString();
-                applyTheme();
-            }
+        marginLineFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.marginLine.fg = marginLineFg.getColorString();
+            applyTheme();
         });
         markAllHighlightColor = new ColorPicker(currentTheme.markAllHighlight.color);
         styleSelectionsPanel.add(new JLabel("Mark All Highlight"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(markAllHighlightColor);
-        markAllHighlightColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.markAllHighlight.color = markAllHighlightColor.getColorString();
-                applyTheme();
-            }
+        markAllHighlightColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.markAllHighlight.color = markAllHighlightColor.getColorString();
+            applyTheme();
         });
         markOccurrencesHighlightBorder = new JCheckBox("true", currentTheme.selection.roundedEdges);
         styleSelectionsPanel.add(new JLabel("Mark Occurrences Highlight"));
         styleSelectionsPanel.add(new JLabel("border"));
         styleSelectionsPanel.add(markOccurrencesHighlightBorder);
-        markOccurrencesHighlightBorder.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.markOccurrencesHighlight.border = markOccurrencesHighlightBorder.isSelected();
-                applyTheme();
-            }
+        markOccurrencesHighlightBorder.addChangeListener((ChangeEvent e) -> {
+            currentTheme.markOccurrencesHighlight.border = markOccurrencesHighlightBorder.isSelected();
+            applyTheme();
         });
         markOccurrencesHighlightColor = new ColorPicker(currentTheme.markOccurrencesHighlight.color);
         styleSelectionsPanel.add(new JLabel(""));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(markOccurrencesHighlightColor);
-        markOccurrencesHighlightColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.markOccurrencesHighlight.color = markOccurrencesHighlightColor.getColorString();
-                applyTheme();
-            }
+        markOccurrencesHighlightColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.markOccurrencesHighlight.color = markOccurrencesHighlightColor.getColorString();
+            applyTheme();
         });
         matchedBracketAnimate = new JCheckBox("true", currentTheme.selection.roundedEdges);
         styleSelectionsPanel.add(new JLabel("Matched Bracket"));
         styleSelectionsPanel.add(new JLabel("animate"));
         styleSelectionsPanel.add(matchedBracketAnimate);
-        matchedBracketAnimate.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.matchedBracket.animate = matchedBracketAnimate.isSelected();
-                applyTheme();
-            }
+        matchedBracketAnimate.addChangeListener((ChangeEvent e) -> {
+            currentTheme.matchedBracket.animate = matchedBracketAnimate.isSelected();
+            applyTheme();
         });
         matchedBracketBg = new ColorPicker(currentTheme.matchedBracket.bg);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("bg"));
         styleSelectionsPanel.add(matchedBracketBg);
-        matchedBracketBg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.matchedBracket.bg = matchedBracketBg.getColorString();
-                applyTheme();
-            }
+        matchedBracketBg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.matchedBracket.bg = matchedBracketBg.getColorString();
+            applyTheme();
         });
         matchedBracketFg = new ColorPicker(currentTheme.matchedBracket.fg);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("fg"));
         styleSelectionsPanel.add(matchedBracketFg);
-        matchedBracketFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.matchedBracket.fg = matchedBracketFg.getColorString();
-                applyTheme();
-            }
+        matchedBracketFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.matchedBracket.fg = matchedBracketFg.getColorString();
+            applyTheme();
         });
         matchedBracketHighlightBoth = new JCheckBox("true", currentTheme.selection.roundedEdges);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("highlight both"));
         styleSelectionsPanel.add(matchedBracketHighlightBoth);
-        matchedBracketHighlightBoth.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.matchedBracket.highlightBoth = matchedBracketHighlightBoth.isSelected();
-                applyTheme();
-            }
+        matchedBracketHighlightBoth.addChangeListener((ChangeEvent e) -> {
+            currentTheme.matchedBracket.highlightBoth = matchedBracketHighlightBoth.isSelected();
+            applyTheme();
         });
         hyperlinksFg = new ColorPicker(currentTheme.hyperlinks.fg);
         styleSelectionsPanel.add(new JLabel("Hyperlinks"));
         styleSelectionsPanel.add(new JLabel("fg"));
         styleSelectionsPanel.add(hyperlinksFg);
-        hyperlinksFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.hyperlinks.fg = hyperlinksFg.getColorString();
-                applyTheme();
-            }
+        hyperlinksFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.hyperlinks.fg = hyperlinksFg.getColorString();
+            applyTheme();
         });
         gutterBackgroundColor = new ColorPicker(currentTheme.gutterBackground.color);
         styleSelectionsPanel.add(new JLabel("Gutter Background"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(gutterBackgroundColor);
-        gutterBackgroundColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.gutterBackground.color = gutterBackgroundColor.getColorString();
-                applyTheme();
-            }
+        gutterBackgroundColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.gutterBackground.color = gutterBackgroundColor.getColorString();
+            applyTheme();
         });
         gutterBorderColor = new ColorPicker(currentTheme.gutterBorder.color);
         styleSelectionsPanel.add(new JLabel("Gutter Border"));
-        styleSelectionsPanel.add(new JLabel("color"));
+        styleSelectionsPanel.add(new JLabel(COLOR));
         styleSelectionsPanel.add(gutterBorderColor);
-        gutterBorderColor.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.gutterBorder.color = gutterBorderColor.getColorString();
-                applyTheme();
-            }
+        gutterBorderColor.addChangeListener((ChangeEvent e) -> {
+            currentTheme.gutterBorder.color = gutterBorderColor.getColorString();
+            applyTheme();
         });
         lineNumbersFg = new ColorPicker(currentTheme.lineNumbers.fg);
         styleSelectionsPanel.add(new JLabel("Line Numbers"));
         styleSelectionsPanel.add(new JLabel("fg"));
         styleSelectionsPanel.add(lineNumbersFg);
-        lineNumbersFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.lineNumbers.fg = lineNumbersFg.getColorString();
-                applyTheme();
-            }
+        lineNumbersFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.lineNumbers.fg = lineNumbersFg.getColorString();
+            applyTheme();
         });
         lineNumbersFontFamily = new JComboBox<>(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
         styleSelectionsPanel.add(new JLabel(""));
@@ -445,67 +359,49 @@ public class ThemeDialog extends JDialog implements WindowListener {
         styleSelectionsPanel.add(lineNumbersFontFamily);
         lineNumbersFontFamily.setSelectedItem(currentTheme.lineNumbers.fontFamily);
         lineNumbersFontFamily.setEditable(false);
-        lineNumbersFontFamily.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                currentTheme.lineNumbers.fontFamily = (String) lineNumbersFontFamily.getSelectedItem();
-                applyTheme();
-            }
+        lineNumbersFontFamily.addItemListener((ItemEvent e) -> {
+            currentTheme.lineNumbers.fontFamily = (String) lineNumbersFontFamily.getSelectedItem();
+            applyTheme();
         });
         lineNumbersFontSize = new JSpinner(new SpinnerNumberModel(currentTheme.lineNumbers.fontSize, 1, 144, 1));
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("font size"));
         styleSelectionsPanel.add(lineNumbersFontSize);
-        lineNumbersFontSize.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.lineNumbers.fontSize = (Integer) lineNumbersFontSize.getValue();
-                applyTheme();
-            }
+        lineNumbersFontSize.addChangeListener((ChangeEvent e) -> {
+            currentTheme.lineNumbers.fontSize = (Integer) lineNumbersFontSize.getValue();
+            applyTheme();
         });
         foldIndicatorFg = new ColorPicker(currentTheme.foldIndicator.fg);
         styleSelectionsPanel.add(new JLabel("Fold Indicator"));
         styleSelectionsPanel.add(new JLabel("fg"));
         styleSelectionsPanel.add(foldIndicatorFg);
-        foldIndicatorFg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.foldIndicator.fg = foldIndicatorFg.getColorString();
-                applyTheme();
-            }
+        foldIndicatorFg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.foldIndicator.fg = foldIndicatorFg.getColorString();
+            applyTheme();
         });
         foldIndicatorIconBg = new ColorPicker(currentTheme.foldIndicator.iconBg);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("icon BG"));
         styleSelectionsPanel.add(foldIndicatorIconBg);
-        foldIndicatorIconBg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.foldIndicator.iconBg = foldIndicatorIconBg.getColorString();
-                applyTheme();
-            }
+        foldIndicatorIconBg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.foldIndicator.iconBg = foldIndicatorIconBg.getColorString();
+            applyTheme();
         });
         iconRowHeaderActiveLineRange = new ColorPicker(currentTheme.iconRowHeader.activeLineRange);
         styleSelectionsPanel.add(new JLabel("Icon Row Header"));
         styleSelectionsPanel.add(new JLabel("active line range"));
         styleSelectionsPanel.add(iconRowHeaderActiveLineRange);
-        iconRowHeaderActiveLineRange.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.iconRowHeader.activeLineRange = iconRowHeaderActiveLineRange.getColorString();
-                applyTheme();
-            }
+        iconRowHeaderActiveLineRange.addChangeListener((ChangeEvent e) -> {
+            currentTheme.iconRowHeader.activeLineRange = iconRowHeaderActiveLineRange.getColorString();
+            applyTheme();
         });
         iconRowHeaderInheritsGutterBg = new JCheckBox("true", currentTheme.selection.roundedEdges);
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel("inherits gutter bg"));
         styleSelectionsPanel.add(iconRowHeaderInheritsGutterBg);
-        iconRowHeaderInheritsGutterBg.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                currentTheme.iconRowHeader.inheritsGutterBG = iconRowHeaderInheritsGutterBg.isSelected();
-                applyTheme();
-            }
+        iconRowHeaderInheritsGutterBg.addChangeListener((ChangeEvent e) -> {
+            currentTheme.iconRowHeader.inheritsGutterBG = iconRowHeaderInheritsGutterBg.isSelected();
+            applyTheme();
         });
         
         secondaryLanguagesBg = new ColorPicker[currentTheme.secondaryLanguages.size()];
@@ -519,18 +415,15 @@ public class ThemeDialog extends JDialog implements WindowListener {
             styleSelectionsPanel.add(new JLabel("bg"));
             styleSelectionsPanel.add(secondaryLanguagesBg[i]);
             final int index = i;
-            secondaryLanguagesBg[i].addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    currentTheme.secondaryLanguages.get(index).bg = secondaryLanguagesBg[index].getColorString();
-                    applyTheme();
-                }
+            secondaryLanguagesBg[i].addChangeListener((ChangeEvent e) -> {
+                currentTheme.secondaryLanguages.get(index).bg = secondaryLanguagesBg[index].getColorString();
+                applyTheme();
             });
         }
         tokenStylesBold = new JCheckBox[currentTheme.tokenStyles.size()];
         tokenStylesFg = new ColorPicker[currentTheme.tokenStyles.size()];
         tokenStylesItalic = new JCheckBox[currentTheme.tokenStyles.size()];
-        tokenStylesToken = new String[currentTheme.tokenStyles.size()];
+        String[] tokenStylesToken = new String[currentTheme.tokenStyles.size()];
         styleSelectionsPanel.add(new JLabel("Styles"));
         styleSelectionsPanel.add(new JLabel(""));
         styleSelectionsPanel.add(new JLabel(""));
@@ -543,24 +436,18 @@ public class ThemeDialog extends JDialog implements WindowListener {
                 styleSelectionsPanel.add(new JLabel(Translations.getString(tokenStylesToken[i])));
                 styleSelectionsPanel.add(new JLabel("bold"));
                 styleSelectionsPanel.add(tokenStylesBold[i]);
-                tokenStylesBold[i].addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        currentTheme.tokenStyles.get(index).bold = tokenStylesBold[index].isSelected() ? Boolean.TRUE : null;
-                        applyTheme();
-                    }
+                tokenStylesBold[i].addChangeListener((ChangeEvent e) -> {
+                    currentTheme.tokenStyles.get(index).bold = tokenStylesBold[index].isSelected() ? Boolean.TRUE : null;
+                    applyTheme();
                 });
                 
                 tokenStylesFg[i] = new ColorPicker(currentTheme.tokenStyles.get(i).fg);
                 styleSelectionsPanel.add(new JLabel(""));
                 styleSelectionsPanel.add(new JLabel("fg"));
                 styleSelectionsPanel.add(tokenStylesFg[i]);
-                tokenStylesFg[i].addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        currentTheme.tokenStyles.get(index).fg = tokenStylesFg[index].getColorString();
-                        applyTheme();
-                    }
+                tokenStylesFg[i].addChangeListener((ChangeEvent e) -> {
+                    currentTheme.tokenStyles.get(index).fg = tokenStylesFg[index].getColorString();
+                    applyTheme();
                 });
                 
                 tokenStylesItalic[i] = new JCheckBox("true");
@@ -568,12 +455,9 @@ public class ThemeDialog extends JDialog implements WindowListener {
                 styleSelectionsPanel.add(new JLabel(""));
                 styleSelectionsPanel.add(new JLabel("italic"));
                 styleSelectionsPanel.add(tokenStylesItalic[i]);
-                tokenStylesItalic[i].addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        currentTheme.tokenStyles.get(index).italic = tokenStylesItalic[index].isSelected() ? Boolean.TRUE : null;
-                        applyTheme();
-                    }
+                tokenStylesItalic[i].addChangeListener((ChangeEvent e) -> {
+                    currentTheme.tokenStyles.get(index).italic = tokenStylesItalic[index].isSelected() ? Boolean.TRUE : null;
+                    applyTheme();
                 });
             }
         }        
@@ -650,7 +534,6 @@ public class ThemeDialog extends JDialog implements WindowListener {
             Format format = new Format(4, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<!DOCTYPE RSyntaxTheme SYSTEM \"theme.dtd\">");
             Serializer serializer = new Persister(format);
             serializer.write(currentTheme, out);
-            out.close();
             Theme theme = Theme.load(new ByteArrayInputStream(bout.toByteArray()));
             theme.apply(syntaxTextArea);
         } catch (Exception e) {
@@ -739,7 +622,9 @@ public class ThemeDialog extends JDialog implements WindowListener {
     }
 
     @Override
-    public void windowOpened(WindowEvent e) {}
+    public void windowOpened(WindowEvent e) {
+        /** not used */
+    }
 
     @Override
     public void windowClosing(WindowEvent e) {
@@ -747,17 +632,27 @@ public class ThemeDialog extends JDialog implements WindowListener {
     }
 
     @Override
-    public void windowClosed(WindowEvent e) {}
+    public void windowClosed(WindowEvent e) {
+        /** not used */
+    }
 
     @Override
-    public void windowIconified(WindowEvent e) {}
+    public void windowIconified(WindowEvent e) {
+        /** not used */
+    }
 
     @Override
-    public void windowDeiconified(WindowEvent e) {}
+    public void windowDeiconified(WindowEvent e) {
+        /** not used */
+    }
 
     @Override
-    public void windowActivated(WindowEvent e) {}
+    public void windowActivated(WindowEvent e) {
+        /** not used */
+    }
 
     @Override
-    public void windowDeactivated(WindowEvent e) {}
+    public void windowDeactivated(WindowEvent e) {
+        /** not used */
+    }
 }

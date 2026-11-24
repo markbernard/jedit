@@ -51,6 +51,7 @@ public class EditAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        /** provides menu controls but needs no action */
     }
 
     /**
@@ -61,15 +62,15 @@ public class EditAction extends AbstractAction {
     public static class UndoAction extends AbstractAction {
         private static final long serialVersionUID = 5936711805304319306L;
         
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
         
         /**
          * Set up values appropriate to the Undo menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public UndoAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public UndoAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Undo");
@@ -81,12 +82,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.undo();
-                }
-            }, "Undo").start();
+            new Thread(jEdit::undo, "Undo").start();
         }
     }
 
@@ -98,15 +94,15 @@ public class EditAction extends AbstractAction {
     public static class RedoAction extends AbstractAction {
         private static final long serialVersionUID = 6599265610327179684L;
 
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
         
         /**
          * Set up values appropriate to the Undo menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public RedoAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public RedoAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Redo");
@@ -118,12 +114,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.redo();
-                }
-            }, "Redo").start();
+            new Thread(jEdit::redo, "Redo").start();
         }
     }
 
@@ -134,15 +125,15 @@ public class EditAction extends AbstractAction {
      */
     public static class CutAction extends AbstractAction {
         private static final long serialVersionUID = 6520482354999730690L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Cut menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public CutAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public CutAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_T);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Cut");
@@ -153,12 +144,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.cut();
-                }
-            }, "Cut").start();
+            new Thread(jEdit::cut, "Cut").start();
         }
     }
 
@@ -169,15 +155,15 @@ public class EditAction extends AbstractAction {
      */
     public static class CopyAction extends AbstractAction {
         private static final long serialVersionUID = -2906245309033009826L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Copy menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public CopyAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public CopyAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_C);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Copy");
@@ -188,12 +174,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.copy();
-                }
-            }, "Copy").start();
+            new Thread(jEdit::copy, "Copy").start();
         }
     }
 
@@ -204,15 +185,15 @@ public class EditAction extends AbstractAction {
      */
     public static class PasteAction extends AbstractAction {
         private static final long serialVersionUID = -555624621599811242L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Paste menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public PasteAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public PasteAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_P);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Paste");
@@ -223,12 +204,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.paste();
-                }
-            }, "Paste").start();
+            new Thread(jEdit::paste, "Paste").start();
         }
     }
 
@@ -239,15 +215,15 @@ public class EditAction extends AbstractAction {
      */
     public static class FindAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Find menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public FindAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public FindAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_F);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Find...");
@@ -258,12 +234,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.find();
-                }
-            }, "Find").start();
+            new Thread(jEdit::find, "Find").start();
         }
     }
 
@@ -274,17 +245,17 @@ public class EditAction extends AbstractAction {
      */
     public static class FindNextAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
-        private SearchDialog searchDialog;
+        private final transient JEdit jEdit;
+        private final SearchDialog searchDialog;
 
         /**
          * Set up values appropriate to the Find Next menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          * @param searchDialog 
          */
-        public FindNextAction(JEdit jNotepad, SearchDialog searchDialog) {
-            this.jNotepad = jNotepad;
+        public FindNextAction(JEdit jEdit, SearchDialog searchDialog) {
+            this.jEdit = jEdit;
             this.searchDialog = searchDialog;
             if (searchDialog == null) {
                 putValue(MNEMONIC_KEY, KeyEvent.VK_N);
@@ -301,21 +272,13 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+            new Thread(() -> {
                     if (searchDialog != null) {
-                        jNotepad.setFindTerm(searchDialog.getFindTerm());
-                        jNotepad.setFindDownDirection(searchDialog.isFindDirectionDown());
-                        jNotepad.setMatchCase(searchDialog.isMatchCase());
+                        jEdit.setFindTerm(searchDialog.getFindTerm());
+                        jEdit.setFindDownDirection(searchDialog.isFindDirectionDown());
+                        jEdit.setMatchCase(searchDialog.isMatchCase());
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            jNotepad.findNext();
-                        }
-                    });
-                }
+                    SwingUtilities.invokeLater(jEdit::findNext);
             }, "Find Next (Menu)").start();
         }
     }
@@ -327,15 +290,15 @@ public class EditAction extends AbstractAction {
      */
     public static class ReplaceAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Replace menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public ReplaceAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public ReplaceAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_R);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Replace...");
@@ -346,12 +309,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.replace();
-                }
-            }, "Replace (menu)").start();
+            new Thread(jEdit::replace, "Replace (menu)").start();
         }
     }
 
@@ -362,15 +320,15 @@ public class EditAction extends AbstractAction {
      */
     public static class GoToAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Go To menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public GoToAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public GoToAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_L);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Go To Line...");
@@ -382,12 +340,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.goTo();
-                }
-            }, "Go To (menu)").start();
+            new Thread(jEdit::goTo, "Go To (menu)").start();
         }
     }
 
@@ -398,15 +351,15 @@ public class EditAction extends AbstractAction {
      */
     public static class SelectAllAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Select All menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public SelectAllAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public SelectAllAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Select All");
@@ -418,12 +371,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.selectAll();
-                }
-            }, "Select All").start();
+            new Thread(jEdit::selectAll, "Select All").start();
         }
     }
 
@@ -434,15 +382,15 @@ public class EditAction extends AbstractAction {
      */
     public static class UppercaseAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Select All menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public UppercaseAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public UppercaseAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
             putValue(NAME, "Uppercase");
@@ -450,12 +398,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.uppercase();
-                }
-            }, "Uppercase").start();
+            new Thread(jEdit::uppercase, "Uppercase").start();
         }
     }
 
@@ -466,15 +409,15 @@ public class EditAction extends AbstractAction {
      */
     public static class LowercaseAction extends AbstractAction {
         private static final long serialVersionUID = 1215020210624036643L;
-        private JEdit jNotepad;
+        private final transient JEdit jEdit;
 
         /**
          * Set up values appropriate to the Select All menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
-        public LowercaseAction(JEdit jNotepad) {
-            this.jNotepad = jNotepad;
+        public LowercaseAction(JEdit jEdit) {
+            this.jEdit = jEdit;
             putValue(MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
             putValue(NAME, "Lowercase");
@@ -482,12 +425,7 @@ public class EditAction extends AbstractAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jNotepad.lowercase();
-                }
-            }, "Lowercase").start();
+            new Thread(jEdit::lowercase, "Lowercase").start();
         }
     }
 
@@ -502,7 +440,7 @@ public class EditAction extends AbstractAction {
         /**
          * Set up values appropriate to the Select All menu item.
          * 
-         * @param jNotepad 
+         * @param jEdit 
          */
         public ToggleCommentAction() {
             putValue(MNEMONIC_KEY, KeyEvent.VK_C);

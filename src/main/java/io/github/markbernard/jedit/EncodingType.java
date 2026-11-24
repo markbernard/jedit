@@ -30,10 +30,12 @@ import java.util.TreeSet;
  * 
  */
 public class EncodingType {
+    private EncodingType() {}
+    
     /** */
-    public static Set<Charset> supportedEncodings = new TreeSet<>((o1, o2) -> o1.displayName().compareTo(o2.displayName()));
+    private static Set<Charset> supportedEncodings = new TreeSet<>((o1, o2) -> o1.displayName().compareTo(o2.displayName()));
     /** */
-    public static Map<Charset, Set<String>> encodingAliasMap = new HashMap<>();
+    private static Map<Charset, Set<String>> encodingAliasMap = new HashMap<>();
     
     static {
         supportedEncodings.add(StandardCharsets.ISO_8859_1);
@@ -49,5 +51,19 @@ public class EncodingType {
         encodingAliasMap.put(StandardCharsets.UTF_16BE, StandardCharsets.UTF_16BE.aliases());
         encodingAliasMap.put(StandardCharsets.UTF_16LE, StandardCharsets.UTF_16LE.aliases());
         encodingAliasMap.put(StandardCharsets.UTF_8, StandardCharsets.UTF_8.aliases());
+    }
+
+    /**
+     * @return the supportedEncodings
+     */
+    public static Set<Charset> getSupportedEncodings() {
+        return new TreeSet<>(supportedEncodings);
+    }
+
+    /**
+     * @return the encodingAliasMap
+     */
+    public static Map<Charset, Set<String>> getEncodingAliasMap() {
+        return new HashMap<>(encodingAliasMap);
     }
 }

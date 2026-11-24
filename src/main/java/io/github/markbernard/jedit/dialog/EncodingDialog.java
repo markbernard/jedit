@@ -24,7 +24,6 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -42,9 +41,9 @@ import javax.swing.JRadioButton;
 public class EncodingDialog extends BasicDialog {
     private static final long serialVersionUID = 8540171150229302594L;
     
-    private JButton okButton;
+    private final JButton okButton;
     private boolean encodingSelected;
-    private Charset selectedCharset;
+    private transient Charset selectedCharset;
 
     /**
      * @param owner
@@ -101,22 +100,16 @@ public class EncodingDialog extends BasicDialog {
         getRootPane().setDefaultButton(okButton);
         addEscapeToActionMap(okButton);
         okButton.setEnabled(enableOkButton);
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                encodingSelected = true;
-                setVisible(false);
-            }
+        okButton.addActionListener((ActionEvent e) -> {
+            encodingSelected = true;
+            setVisible(false);
         });
         JButton cancelButton = new JButton("Cancel");
         buttonPanel.add(cancelButton);
         addEscapeToActionMap(cancelButton);
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                encodingSelected = false;
-                setVisible(false);
-            }
+        cancelButton.addActionListener((ActionEvent e) -> {
+            encodingSelected = false;
+            setVisible(false);
         });
         
         centerDialog();
@@ -128,12 +121,9 @@ public class EncodingDialog extends BasicDialog {
         encodingButtonGroup.add(radioButton);
         encodingListPanel.add(radioButton);
         addEscapeToActionMap(radioButton);
-        radioButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okButton.setEnabled(true);
-                selectedCharset = charset;
-            }
+        radioButton.addActionListener((ActionEvent e) -> {
+            okButton.setEnabled(true);
+            selectedCharset = charset;
         });
         
         return radioButton;
@@ -142,7 +132,7 @@ public class EncodingDialog extends BasicDialog {
     private boolean checkEncodingName(JRadioButton radioButton, Charset charset, Charset charsetCheck) {
         boolean result = false;
         
-        if (charset.name().equals(charsetCheck)) {
+        if (charset.name().equals(charsetCheck.name())) {
             radioButton.setSelected(true);
             selectedCharset = charset;
             result = true;

@@ -23,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
@@ -49,15 +48,15 @@ import io.github.markbernard.jedit.action.EditAction;
 public class SearchDialog extends BasicDialog implements DocumentListener {
     private static final long serialVersionUID = 7765170324238442423L;
 
-    private JTextField findField;
+    private final JTextField findField;
     private JTextField replaceField;
-    private JCheckBox matchCase;
+    private final JCheckBox matchCase;
     private JRadioButton upRadio;
     private JRadioButton downRadio;
-    private JButton findNextButton;
+    private final JButton findNextButton;
     private JButton replaceButton;
     private JButton replaceAllButton;
-    private boolean replace;
+    private final boolean replace;
     
     /**
      * Set up GUI
@@ -148,12 +147,9 @@ public class SearchDialog extends BasicDialog implements DocumentListener {
         JButton cancel = new JButton("Cancel");
         addEscapeToActionMap(cancel);
         buttonPanel.add(cancel);
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                dispose();
-            }
+        cancel.addActionListener((ActionEvent e) -> {
+            setVisible(false);
+            dispose();
         });
         
         setResizable(false);

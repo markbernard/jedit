@@ -32,7 +32,7 @@ import javax.swing.ImageIcon;
  */
 public class IconGenerator {
     private static final Map<String, Icon> iconCache = new HashMap<String, Icon>();
-    private String path;
+    private final String path;
 
     /**
      * @param path Path to the resource
