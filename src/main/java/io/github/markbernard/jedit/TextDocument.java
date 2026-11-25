@@ -57,7 +57,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -137,8 +136,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         setLayout(new BorderLayout());
         syntaxTextArea = new RSyntaxTextArea(20, 60);
         syntaxTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_NONE);
-        syntaxTextArea.setCodeFoldingEnabled(true);
         textScrollPane = new RTextScrollPane(syntaxTextArea);
+        textScrollPane.setLineNumbersEnabled(applicationPreferences.isEnableLineNumbers());
         add(textScrollPane, BorderLayout.CENTER);
         syntaxTextArea.addCaretListener(new CaretListener() {
             @Override
@@ -156,6 +155,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         removeKeyStrokes(syntaxTextArea);
         syntaxTextArea.getDocument().addDocumentListener(this);
         updateStatusBar(syntaxTextArea.getCaretPosition());
+        syntaxTextArea.setTabsEmulated(applicationPreferences.isSpacesInsteadOfTabs());
+        syntaxTextArea.setTabSize(applicationPreferences.getTabSize());
     }
     
     /**
@@ -437,9 +438,6 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     }
     
     private Point calculatePosition(int position) throws BadLocationException {
-        //TODO change
-//        String[] lines = syntaxTextArea.getText().split(REGEX_NEW_LINE_CHAR[newLineTypeUsed]);
-        
         int line = 0;
         int offset = position;
         while (offset > 0) {
@@ -634,8 +632,15 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private void saveFile() {
         final JComponent parentComponent = this;
         final String path = filePath + ApplicationPreferences.FILE_PATH_SEPARATOR + fileName;
-        SwingUtilities.invokeLater(() -> {
+        new Thread(() -> {
             try (Writer out = new OutputStreamWriter(new FileOutputStream(path), charset)) {
+                if (applicationPreferences.isConvertTabsOrSpacesOnSave()) {
+                    if (applicationPreferences.isSpacesInsteadOfTabs()) {
+                        syntaxTextArea.convertTabsToSpaces();
+                    } else {
+                        syntaxTextArea.convertSpacesToTabs();
+                    }
+                }
                 out.write(syntaxTextArea.getText());
             } catch (FileNotFoundException e) {
                 String errorMessage = "Unable to create the file: " + path + "\n" + e.getMessage();
@@ -646,7 +651,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(parentComponent, "Unable to save the file: " + path, "Error saving file", JOptionPane.ERROR_MESSAGE);
             }
-        });
+        }, "Save " + fileName).start();
     }
 
     /**
@@ -851,6 +856,15 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
             syntaxTextArea.replaceRange(syntaxTextArea.getSelectedText().toLowerCase(), selectionStart, selectionEnd);
         }
         
+    }
+    
+    /**
+     * 
+     */
+    public void updateConfiguration() {
+        syntaxTextArea.setTabSize(applicationPreferences.getTabSize());
+        syntaxTextArea.setTabsEmulated(applicationPreferences.isSpacesInsteadOfTabs());
+        textScrollPane.setLineNumbersEnabled(applicationPreferences.isEnableLineNumbers());
     }
 
     /**

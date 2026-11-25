@@ -27,7 +27,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -63,7 +62,9 @@ import io.github.markbernard.jedit.action.DocumentAction;
 import io.github.markbernard.jedit.action.EditAction;
 import io.github.markbernard.jedit.action.FileAction;
 import io.github.markbernard.jedit.action.HelpAction;
+import io.github.markbernard.jedit.action.PreferencesAction;
 import io.github.markbernard.jedit.dialog.AboutDialog;
+import io.github.markbernard.jedit.dialog.ConfigurationDialog;
 import io.github.markbernard.jedit.dialog.SearchDialog;
 import io.github.markbernard.jedit.dialog.ThemeDialog;
 
@@ -76,6 +77,7 @@ public class JEdit implements WindowListener, KeyListener {
 
     private boolean insertPressed = false;
     private final JFrame parent;
+    private JPanel mainStatusBarPanel;
     private TextDocument currentDocument;
     private JMenu fileRecentDocuments;
     private JMenuItem editUndoMenuItem;
@@ -95,7 +97,6 @@ public class JEdit implements WindowListener, KeyListener {
     private boolean findDownDirection;
     private boolean matchCase;
     private boolean insertMode = true;
-    private boolean readOnly = false;
     private int newDocumentCounter;
     private final ApplicationPreferences applicationPreferences;
     
@@ -247,11 +248,12 @@ public class JEdit implements WindowListener, KeyListener {
             encodingMenu.add(charsetMenuItem);
         }
 
-        JMenu preferencesMenu = new JMenu("Preferences");
+        JMenu preferencesMenu = new JMenu(new PreferencesAction());
         bar.add(preferencesMenu);
-        JMenuItem styleMenuItem = new JMenuItem("Style");
+        JMenuItem configurationMenuItem = new JMenuItem(new PreferencesAction.ConfigurationAction(this));
+        preferencesMenu.add(configurationMenuItem);
+        JMenuItem styleMenuItem = new JMenuItem(new PreferencesAction.StylesAction(this));
         preferencesMenu.add(styleMenuItem);
-        styleMenuItem.addActionListener((ActionEvent e) -> new ThemeDialog(parent).setVisible(true));
 
         JMenu helpMenu = new JMenu(new HelpAction());
         bar.add(helpMenu);
@@ -282,7 +284,7 @@ public class JEdit implements WindowListener, KeyListener {
     
     private void createStatusBar() {
         Font statusBarFont = new Font("Consolas", Font.PLAIN, 14);
-        JPanel mainStatusBarPanel = new JPanel(new BorderLayout(0, 0));
+        mainStatusBarPanel = new JPanel(new BorderLayout(0, 0));
         setStausBorder(mainStatusBarPanel);
         JPanel statusBarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         mainStatusBarPanel.add(statusBarPanel, BorderLayout.WEST);
@@ -335,9 +337,9 @@ public class JEdit implements WindowListener, KeyListener {
         filePathPanel.add(filePathLabel, BorderLayout.WEST);
         filePathLabel.setFont(statusBarFont);
 
-        if (applicationPreferences.isShowStatusBar()) {
-            editorPanel.add(mainStatusBarPanel, BorderLayout.SOUTH);
-        }
+        editorPanel.add(mainStatusBarPanel, BorderLayout.SOUTH);
+        
+        mainStatusBarPanel.setVisible(applicationPreferences.isShowStatusBar());
     }
 
     private void setStausBorder(JPanel panel) {
@@ -773,10 +775,36 @@ public class JEdit implements WindowListener, KeyListener {
         //TODO implement
     }
 
+    /**
+     * 
+     */
     public void help() {
         //TODO implement
     }
 
+    /**
+     * 
+     */
+    public void editStyles() {
+        new ThemeDialog(parent).setVisible(true);
+    }
+    
+    /**
+     * 
+     */
+    public void editConfiguration() {
+        ConfigurationDialog configurationDialog = new ConfigurationDialog(parent);
+        configurationDialog.setVisible(true);
+        if (configurationDialog.isSaveTriggered()) {
+            SwingUtilities.invokeLater(() -> {
+                for (int i=0;i<tabbedPane.getTabCount();i++) {
+                    ((TextDocument) tabbedPane.getComponentAt(i)).updateConfiguration();
+                }
+                mainStatusBarPanel.setVisible(applicationPreferences.isShowStatusBar());
+            });
+        }
+    }
+    
     /**
      * Exit while saving prefrenecs and checking if save is required.
      */

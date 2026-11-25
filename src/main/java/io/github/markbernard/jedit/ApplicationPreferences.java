@@ -92,6 +92,18 @@ public class ApplicationPreferences {
     private int themeDialogStyleDividerLocation;
     @Element(required = false)
     private boolean showStatusBar;
+    @Element(required = false)
+    private boolean spacesInsteadOfTabs;
+    @Element(required = false)
+    private int tabSize;
+    @Element(required = false)
+    private boolean convertTabsOrSpacesOnSave;
+    @Element(required = false)
+    private boolean enableLineNumbers;
+    @Element(required = false)
+    private int configurationDialogX;
+    @Element(required = false)
+    private int configurationDialogY;
     
     /**
      * @return The one instance
@@ -123,10 +135,13 @@ public class ApplicationPreferences {
             configurationPath.mkdirs();
         }
         
-        setDefaults();
+        resetToDefaults();
     }
     
-    private void setDefaults() {
+    /**
+     * Remove all configurations and set to defaults.
+     */
+    public void resetToDefaults() {
         windowX = 0;
         windowY = 0;
         windowWidth = 1024;
@@ -148,6 +163,12 @@ public class ApplicationPreferences {
         themeDialogMainDividerLocation = 120;
         themeDialogStyleDividerLocation = 425;
         showStatusBar = true;
+        spacesInsteadOfTabs = true;
+        tabSize = 4;
+        convertTabsOrSpacesOnSave = true;
+        enableLineNumbers = true;
+        configurationDialogX = 0;
+        configurationDialogY = 0;
     }
     
     private void copy(ApplicationPreferences copyFrom) {
@@ -172,6 +193,12 @@ public class ApplicationPreferences {
         themeDialogMainDividerLocation = copyFrom.themeDialogMainDividerLocation;
         themeDialogStyleDividerLocation = copyFrom.themeDialogStyleDividerLocation;
         showStatusBar = copyFrom.showStatusBar;
+        spacesInsteadOfTabs = copyFrom.spacesInsteadOfTabs;
+        tabSize = copyFrom.tabSize;
+        convertTabsOrSpacesOnSave = copyFrom.convertTabsOrSpacesOnSave;
+        enableLineNumbers = copyFrom.enableLineNumbers;
+        configurationDialogX = copyFrom.configurationDialogX;
+        configurationDialogY = copyFrom.configurationDialogY;
     }
     
     /**
@@ -456,4 +483,89 @@ public class ApplicationPreferences {
     public void setShowStatusBar(boolean showStatusBar) {
         this.showStatusBar = showStatusBar;
     }
+
+    /**
+     * @return the spacesInsteadOfTabs
+     */
+    public boolean isSpacesInsteadOfTabs() {
+        return spacesInsteadOfTabs;
+    }
+
+    /**
+     * @param spacesInsteadOfTabs the spacesInsteadOfTabs to set
+     */
+    public void setSpacesInsteadOfTabs(boolean spacesInsteadOfTabs) {
+        this.spacesInsteadOfTabs = spacesInsteadOfTabs;
+    }
+
+    /**
+     * @return the tabSize
+     */
+    public int getTabSize() {
+        return tabSize;
+    }
+
+    /**
+     * @param tabSize the tabSize to set
+     */
+    public void setTabSize(int tabSize) {
+        this.tabSize = tabSize;
+    }
+
+    /**
+     * @return the convertTabsOrSpacesOnSave
+     */
+    public boolean isConvertTabsOrSpacesOnSave() {
+        return convertTabsOrSpacesOnSave;
+    }
+
+    /**
+     * @param convertTabsOrSpacesOnSave the convertTabsOrSpacesOnSave to set
+     */
+    public void setConvertTabsOrSpacesOnSave(boolean convertTabsOrSpacesOnSave) {
+        this.convertTabsOrSpacesOnSave = convertTabsOrSpacesOnSave;
+    }
+
+    /**
+     * @return the enableLineNumbers
+     */
+    public boolean isEnableLineNumbers() {
+        return enableLineNumbers;
+    }
+
+    /**
+     * @param enableLineNumbers the enableLineNumbers to set
+     */
+    public void setEnableLineNumbers(boolean enableLineNumbers) {
+        this.enableLineNumbers = enableLineNumbers;
+    }
+
+    /**
+     * @return the configurationDialogX
+     */
+    public int getConfigurationDialogX() {
+        return configurationDialogX;
+    }
+
+    /**
+     * @param configurationDialogX the configurationDialogX to set
+     */
+    public void setConfigurationDialogX(int configurationDialogX) {
+        this.configurationDialogX = configurationDialogX;
+    }
+
+    /**
+     * @return the configurationDialogY
+     */
+    public int getConfigurationDialogY() {
+        return configurationDialogY;
+    }
+
+    /**
+     * @param configurationDialogY the configurationDialogY to set
+     */
+    public void setConfigurationDialogY(int configurationDialogY) {
+        this.configurationDialogY = configurationDialogY;
+    }
+
 }

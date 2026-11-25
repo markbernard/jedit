@@ -142,7 +142,7 @@ public class DocumentAction extends AbstractAction {
             public void actionPerformed(ActionEvent e) {
                 new Thread(() -> {
                     jEdit.setLanguage(languageInfo);
-                }, Translations.getString("DialogAction.LanguageAction.LanguageChoiceAction.actionPerformed.changelanguage", languageInfo.getName())).start();
+                }, "Change Language").start();
             }
         
         }
