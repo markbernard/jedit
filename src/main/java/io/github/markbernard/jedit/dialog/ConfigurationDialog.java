@@ -32,12 +32,12 @@ public class ConfigurationDialog extends BasicDialog {
     private static final String CONVERT_TO_TABS = "Convert Spaces To Tabs On Save";
     private static final String CONVERT_TO_SPACES = "Convert Tabs To Spaces On Save";
     
-    private ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
-    private JCheckBox showStatusBarCheckbox;
-    private JCheckBox useSpacesInsteadOfTabsCheckbox;
-    private JSpinner tabSizeSPinner;
-    private JCheckBox converTabsOrSpacesCheckbox;
-    private JCheckBox enableLineNumbersCheckbox;
+    private final transient ApplicationPreferences applicationPreferences = ApplicationPreferences.getInstance();
+    private final JCheckBox showStatusBarCheckbox;
+    private final JCheckBox useSpacesInsteadOfTabsCheckbox;
+    private final JSpinner tabSizeSPinner;
+    private final JCheckBox converTabsOrSpacesCheckbox;
+    private final JCheckBox enableLineNumbersCheckbox;
     private boolean saveTriggered;
 
     /**

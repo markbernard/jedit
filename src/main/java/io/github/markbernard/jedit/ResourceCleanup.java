@@ -30,6 +30,8 @@ import java.io.Writer;
  * @author Mark Bernard
  */
 public class ResourceCleanup {
+    private ResourceCleanup() {}
+    
     /**
      * Close a reader safely.
      * 

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -71,6 +72,7 @@ public class ThemeDialog extends JDialog implements WindowListener {
     private final JSplitPane mainSplit;
     private JSplitPane styleSplit;
     private RSyntaxTextArea syntaxTextArea;
+    private RTextScrollPane scrollPane;
     private final JList<String> languageList;
     private JSpinner baseFontSize;
     private ColorPicker backgroundColor;
@@ -472,8 +474,11 @@ public class ThemeDialog extends JDialog implements WindowListener {
         JPanel samplePanel = new JPanel(new BorderLayout());
         styleSplit.add(samplePanel, JSplitPane.RIGHT);
         syntaxTextArea = new RSyntaxTextArea();
-        RTextScrollPane scrollPane = new RTextScrollPane(syntaxTextArea);
+        scrollPane = new RTextScrollPane(syntaxTextArea);
         syntaxTextArea.setEditable(false);
+        scrollPane.getGutter().setBookmarkIcon(new ImageIcon(getClass().getResource("/icons/BookmarkIcon.png")));
+        scrollPane.getGutter().setBookmarkingEnabled(true);
+        scrollPane.setIconRowHeaderEnabled(true);
         samplePanel.add(scrollPane, BorderLayout.CENTER);
     }
     
@@ -559,6 +564,7 @@ public class ThemeDialog extends JDialog implements WindowListener {
                     content.append(buffer, 0, read);
                 }
                 syntaxTextArea.setText(content.toString());
+                scrollPane.getGutter().toggleBookmark(3);
             }
         } catch (Exception e) {
             e.printStackTrace();

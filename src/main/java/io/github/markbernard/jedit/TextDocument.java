@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -58,7 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -93,8 +93,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private final transient JEdit jEdit;
     private RSyntaxTextArea syntaxTextArea;
     private RTextScrollPane textScrollPane;
-    private LanguageInfo languageInfo;
-    private final int newLineTypeUsed = 0;
+    private transient LanguageInfo languageInfo;
+    private static final int NEW_LINE_TYPE_USED = 0;
 
     private String newFileName = "";
     private String fileName;
@@ -139,12 +139,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         textScrollPane = new RTextScrollPane(syntaxTextArea);
         textScrollPane.setLineNumbersEnabled(applicationPreferences.isEnableLineNumbers());
         add(textScrollPane, BorderLayout.CENTER);
-        syntaxTextArea.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                updateStatusBar(e.getDot());
-            }
-        });
+        syntaxTextArea.addCaretListener((CaretEvent e) -> updateStatusBar(e.getDot()) );
         syntaxTextArea.addKeyListener(jEdit);
         syntaxTextArea.addKeyListener(this);
         updateStatusBar(syntaxTextArea.getCaretPosition());
@@ -157,6 +152,9 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         updateStatusBar(syntaxTextArea.getCaretPosition());
         syntaxTextArea.setTabsEmulated(applicationPreferences.isSpacesInsteadOfTabs());
         syntaxTextArea.setTabSize(applicationPreferences.getTabSize());
+        textScrollPane.getGutter().setBookmarkIcon(new ImageIcon(getClass().getResource("/icons/BookmarkIcon.png")));
+        textScrollPane.getGutter().setBookmarkingEnabled(true);
+        textScrollPane.setIconRowHeaderEnabled(true);
     }
     
     /**
@@ -166,13 +164,6 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         return (dirty ? "*" : "") + fileName;
     }
 
-    /**
-     * @return The text.
-     */
-//    public JTextPane getTextArea() {
-//        return textPane;
-//    }
-    
     /**
      * Cut the selected text and place it in the system clipboard
      */
@@ -196,29 +187,30 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      */
     public void performPaste(DataFlavor flavor, Clipboard clipboard) {
         try {
-            String data = (String)clipboard.getData(flavor);
+            String data = (String) clipboard.getData(flavor);
             int start = syntaxTextArea.getSelectionStart();
             int end = syntaxTextArea.getSelectionEnd();
             int length = end - start;
             Document doc = syntaxTextArea.getDocument();
-            try {
-                if (length > 0) {
-                    doc.remove(start, length);
-                }
-                doc.insertString(start, data, null);
-                int location = start + data.length();
-                syntaxTextArea.setSelectionStart(location);
-                syntaxTextArea.setSelectionEnd(location);
-            } catch (BadLocationException e) {
-                //looks like there is nothing to remove
-                //if a mistake occurs we can still try standard paste
-                syntaxTextArea.paste();
-            }
-        } catch (UnsupportedFlavorException e) {
+            doPaste(length, doc,start, data);
+        } catch (UnsupportedFlavorException | IOException e) {
             // generally this should not happen since we checked before hand if the flavor passed in was available.
             //if a mistake occurs we can still try standard paste
             syntaxTextArea.paste();
-        } catch (IOException e) {
+        }
+    }
+
+    private void doPaste(int length, Document doc, int start, String data) {
+        try {
+            if (length > 0) {
+                doc.remove(start, length);
+            }
+            doc.insertString(start, data, null);
+            int location = start + data.length();
+            syntaxTextArea.setSelectionStart(location);
+            syntaxTextArea.setSelectionEnd(location);
+        } catch (BadLocationException e) {
+            //looks like there is nothing to remove
             //if a mistake occurs we can still try standard paste
             syntaxTextArea.paste();
         }
@@ -485,52 +477,17 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         Reader in = null;
         
         try (TikaInputStream tikaInputStream = TikaInputStream.get(new BufferedInputStream(new FileInputStream(path))) ) {
-            EncodingDetector detector = new DefaultEncodingDetector();
-            Metadata metadata = new Metadata();
-            ParseContext context = new ParseContext();
-            
-            tikaInputStream.enableRewind();
-            List<EncodingResult> results = detector.detect(tikaInputStream, metadata, context);
-            if (!results.isEmpty()) {
-                charset = results.get(0).getCharset();
-            } else {
-                charset = StandardCharsets.UTF_8;
-            }
-            if (charset.equals(StandardCharsets.ISO_8859_1)) {
-                charset = StandardCharsets.UTF_8;
-            }
-            Map<Charset, Set<String>> encodingAliasMap = EncodingType.getEncodingAliasMap();
-            if (EncodingType.getSupportedEncodings().contains(charset) && !encodingAliasMap.containsKey(charset)) {
-                for (Entry<Charset, Set<String>> entry : encodingAliasMap.entrySet()) {
-                    if (entry.getValue().contains(entry.getKey().name())) {
-                        charset = entry.getKey();
-                        break;
-                    }
-                }
-            }
-            tikaInputStream.rewind();
+            checkFileEncoding(tikaInputStream);
             in = new InputStreamReader(tikaInputStream);
-            StringBuilder content = new StringBuilder();
-            String line = null;
-            BufferedReader reader = new BufferedReader(in);
-            while ((line = reader.readLine()) != null) {
-                content.append(line);
-                content.append(NEW_LINE_CHAR[newLineTypeUsed]);
-            }
-            in.close();
-            syntaxTextArea.setText(content.toString());
+            loadFileContents(in);
             String fullPathToFile = path.getAbsolutePath();
             setLanguageInfo(DocumentFormatType.determineFormatFromFile(fullPathToFile));
             int index = fullPathToFile.lastIndexOf(".");
             if (index > -1) {
                 String extension = fullPathToFile.substring(index + 1).toLowerCase();
-                try {
-                    Theme theme = ThemeManager.loadNativeTheme(extension);
-                    if (theme != null) {
-                        theme.apply(syntaxTextArea);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Theme theme = ThemeManager.loadNativeTheme(extension);
+                if (theme != null) {
+                    theme.apply(syntaxTextArea);
                 }
             }
             undoManager.discardAllEdits();
@@ -544,6 +501,45 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         } finally {
             ResourceCleanup.close(in);
         }
+    }
+
+    private void checkFileEncoding(TikaInputStream tikaInputStream) throws IOException {
+        EncodingDetector detector = new DefaultEncodingDetector();
+        Metadata metadata = new Metadata();
+        ParseContext context = new ParseContext();
+        
+        tikaInputStream.enableRewind();
+        List<EncodingResult> results = detector.detect(tikaInputStream, metadata, context);
+        if (!results.isEmpty()) {
+            charset = results.get(0).getCharset();
+        } else {
+            charset = StandardCharsets.UTF_8;
+        }
+        if (charset.equals(StandardCharsets.ISO_8859_1)) {
+            charset = StandardCharsets.UTF_8;
+        }
+        Map<Charset, Set<String>> encodingAliasMap = EncodingType.getEncodingAliasMap();
+        if (EncodingType.getSupportedEncodings().contains(charset) && !encodingAliasMap.containsKey(charset)) {
+            for (Entry<Charset, Set<String>> entry : encodingAliasMap.entrySet()) {
+                if (entry.getValue().contains(entry.getKey().name())) {
+                    charset = entry.getKey();
+                    break;
+                }
+            }
+        }
+        tikaInputStream.rewind();
+    }
+
+    private void loadFileContents(Reader in) throws IOException {
+        StringBuilder content = new StringBuilder();
+        String line = null;
+        BufferedReader reader = new BufferedReader(in);
+        while ((line = reader.readLine()) != null) {
+            content.append(line);
+            content.append(NEW_LINE_CHAR[NEW_LINE_TYPE_USED]);
+        }
+        in.close();
+        syntaxTextArea.setText(content.toString());
     }
 
     private void removeKeyStrokes(RSyntaxTextArea textArea) {

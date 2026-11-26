@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -116,15 +117,17 @@ private static final String THEME_FILE_NAME = "_theme.xml";
     /**
      * @param langaugeExtension
      * @return the loaded theme or null if not found
-     * @throws Exception
+     * @throws IOException
      */
-    public static Theme loadNativeTheme(String langaugeExtension) throws Exception {
+    public static Theme loadNativeTheme(String langaugeExtension) {
         Theme theme = null;
         initPath();
         File themeFile = new File(themePathString + ApplicationPreferences.FILE_PATH_SEPARATOR + langaugeExtension + THEME_FILE_NAME);
         if (themeFile.exists()) {
             try (InputStream in = new FileInputStream(themeFile)) {
                 theme = Theme.load(in);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         

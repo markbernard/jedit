@@ -36,16 +36,16 @@ import javax.swing.JPanel;
  */
 public class TabComponent extends JPanel implements MouseListener {
     private static final long serialVersionUID = 2208710958031050223L;
-    private JEdit jNotepad;
-    private JLabel labelName;
-    private SimpleIcon simpleIcon;
+    private final transient JEdit jEdit;
+    private final JLabel labelName;
+    private final SimpleIcon simpleIcon;
 
     /**
      * @param jNotepad 
      * @param componentName 
      */
     public TabComponent(JEdit jNotepad, String componentName) {
-        this.jNotepad = jNotepad;
+        this.jEdit = jNotepad;
         setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
         setOpaque(false);
         setLayout(new BorderLayout(10, 0));
@@ -57,13 +57,14 @@ public class TabComponent extends JPanel implements MouseListener {
         add(labelName);
     }
 
+    @Override
     public void setName(String name) {
         labelName.setText(name);
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        jNotepad.closeTab(this);
+        jEdit.closeTab(this);
     }
 
     @Override
@@ -101,9 +102,9 @@ public class TabComponent extends JPanel implements MouseListener {
     class SimpleIcon extends JComponent {
         private static final long serialVersionUID = 4289034267693173133L;
 
-        private Icon icon;
-        private Icon hoverIcon;
-        private Icon pressedIcon;
+        private final transient Icon icon;
+        private final transient Icon hoverIcon;
+        private final transient Icon pressedIcon;
         
         private boolean hover;
         private boolean pressed;
@@ -115,6 +116,7 @@ public class TabComponent extends JPanel implements MouseListener {
             setToolTipText("Click to close");
         }
         
+        @Override
         public void paintComponent(Graphics g) {
             if (pressed) {
                 pressedIcon.paintIcon(this, g, 0, 0);
@@ -125,6 +127,7 @@ public class TabComponent extends JPanel implements MouseListener {
             }
         }
         
+        @Override
         public Dimension getPreferredSize() {
             return new Dimension(icon.getIconWidth(), icon.getIconHeight());
         }

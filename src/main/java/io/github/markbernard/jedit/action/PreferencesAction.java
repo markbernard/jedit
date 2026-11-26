@@ -35,7 +35,7 @@ public class PreferencesAction extends AbstractAction {
      */
     public static class ConfigurationAction extends AbstractAction {
         private static final long serialVersionUID = -5711964150996442266L;
-        private JEdit jEdit;
+        private final transient JEdit jEdit;
 
         /**
          * @param jEdit 
@@ -61,7 +61,7 @@ public class PreferencesAction extends AbstractAction {
      */
     public static class StylesAction extends AbstractAction {
         private static final long serialVersionUID = -5711964150996442266L;
-        private JEdit jEdit;
+        private final transient JEdit jEdit;
 
         /**
          * @param jEdit 
