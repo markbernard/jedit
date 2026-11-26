@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=JEdit
+Comment=Launch Jedit
+Exec=/usr/bin/jedit
+Icon=/opt/jedit/jedit.png
+Terminal=false
+Categories=Utility;

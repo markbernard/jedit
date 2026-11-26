@@ -83,16 +83,16 @@ public class DocumentAction extends AbstractAction {
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
             putValue(Action.NAME, Translations.getString("DialogAction.WordWrapAction.wordwrap"));
             putValue(Action.SHORT_DESCRIPTION, Translations.getString("DialogAction.WordWrapAction.constuctor.wordwrap.description"));
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadIcon());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             new Thread(() -> {
                 applicationPreferences.setWordWrap(!applicationPreferences.isWordWrap());
-                putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
-                putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadImage());
+                putValue(Action.SMALL_ICON, new IconGenerator("/icons/WordWrapSmall" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadIcon());
+                putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/WordWrap" + (applicationPreferences.isWordWrap() ? "On" : "Off") + ".png").loadIcon());
                 jEdit.wordWrap();
             }, Translations.getString("DialogAction.WordWrapAction.wordwrap")).start();
         }

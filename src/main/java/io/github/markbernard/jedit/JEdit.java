@@ -33,12 +33,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -98,6 +102,8 @@ public class JEdit implements WindowListener, KeyListener {
     private boolean matchCase;
     private boolean insertMode = true;
     private int newDocumentCounter;
+    private PrintRequestAttributeSet printRequestAttributeSet;
+    
     private final ApplicationPreferences applicationPreferences;
     
     /**
@@ -107,6 +113,7 @@ public class JEdit implements WindowListener, KeyListener {
     public JEdit(JFrame parent, String[] args) {
         this.parent = parent;
         parent.addWindowListener(this);
+        parent.setIconImage(new IconGenerator("/icons/jedit.png").loadImage());
         applicationPreferences = ApplicationPreferences.getInstance();
         applicationPreferences.loadPrefs(parent);
         editorPanel = new JPanel(new BorderLayout());
@@ -762,17 +769,27 @@ public class JEdit implements WindowListener, KeyListener {
     }
 
     /**
-     * 
+     * Show the user the page setup dialog and store the users settings.
      */
     public void pageSetup() {
-        //TODO implement
+        if (printRequestAttributeSet == null) {
+            printRequestAttributeSet = new HashPrintRequestAttributeSet();
+        }
+        PrinterJob.getPrinterJob().pageDialog(printRequestAttributeSet);
     }
 
     /**
-     * 
+     * Perform the printing request.
      */
     public void doPrint() {
-        //TODO implement
+        try {
+            if (printRequestAttributeSet == null) {
+                printRequestAttributeSet = new HashPrintRequestAttributeSet();
+            }
+            currentDocument.doPrint(printRequestAttributeSet);
+        } catch (PrinterException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

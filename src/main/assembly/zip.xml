@@ -1,0 +1,26 @@
+<assembly xmlns="http://apache.org"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://apache.org http://apache.org">
+    <id>distribution</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <!-- Set to false if you don't want a root folder inside the zip -->
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <files>
+        <!-- Include project files (e.g., scripts, configs, README) -->
+        <file>
+            <source>${project.basedir}/src/main/os_app_res/jedit.cmd</source>
+            <outputDirectory>/jedit/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/src/main/os_app_res/jedit.ico</source>
+            <outputDirectory>/jedit/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.build.directory}/${project.build.finalName}.jar</source>
+            <outputDirectory>/jedit/</outputDirectory>
+        </file>
+    </files>
+</assembly>

@@ -60,6 +60,16 @@
               <mode>0755</mode>
             </entry>
             <entry>
+              <name>/opt/jedit/jedit.png</name>
+              <file>${project.basedir}/src/main/os_app_res/jedit.png</file>
+              <mode>0644</mode>
+            </entry>
+            <entry>
+              <name>/usr/share/applications/jedit.desktop</name>
+              <file>${project.basedir}/src/main/os_app_res/jedit.desktop</file>
+              <mode>0644</mode>
+            </entry>
+            <entry>
               <name>/opt/jedit/${project.build.finalName}.jar</name>
               <file>${project.build.directory}/${project.build.finalName}.jar</file>
               <mode>0644</mode>
@@ -89,6 +99,28 @@
                   </mapper>
                 </data>
                 <data>
+                  <src>src/main/os_app_res/jedit.png</src>
+                  <dst>/opt/${project.artifactId}/jedit.png</dst>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <user>root</user>
+                    <group>root</group>
+                    <filemode>644</filemode>
+                  </mapper>
+                </data>
+                <data>
+                  <src>src/main/os_app_res/jedit.desktop</src>
+                  <dst>/usr/share/applications/jedit.desktop</dst>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <user>root</user>
+                    <group>root</group>
+                    <filemode>644</filemode>
+                  </mapper>
+                </data>
+                <data>
                   <src>src/main/scripts/jedit.sh</src>
                   <dst>/usr/bin/jedit</dst>
                   <type>file</type>
@@ -109,6 +141,25 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.7.1</version>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/zip.xml</descriptor>
+          </descriptors>
+          <finalName>jedit</finalName>
+        </configuration>
       </plugin>
     </plugins>
   </build>

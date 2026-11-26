@@ -19,6 +19,7 @@
  */
 package io.github.markbernard.jedit;
 
+import java.awt.Image;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,8 @@ import javax.swing.ImageIcon;
  * @author Mark Bernard
  */
 public class IconGenerator {
-    private static final Map<String, Icon> iconCache = new HashMap<String, Icon>();
+    private static final Map<String, Icon> iconCache = new HashMap<>();
+    private static final Map<String, Image> imageCache = new HashMap<>();
     private final String path;
 
     /**
@@ -42,9 +44,9 @@ public class IconGenerator {
     }
     
     /**
-     * @return The image pointed to by the provided path
+     * @return The icon pointed to by the provided path
      */
-    public Icon loadImage() {
+    public Icon loadIcon() {
         Icon icon = iconCache.get(path);
         
         if (icon == null) {
@@ -57,5 +59,23 @@ public class IconGenerator {
         }
         
         return icon;
+    }
+    
+    /**
+     * @return The image pointed to by the provided path
+     */
+    public Image loadImage() {
+        Image image = imageCache.get(path);
+        
+        if (image == null) {
+            try {
+                image = ImageIO.read(getClass().getResourceAsStream(path));
+                imageCache.put(path, image);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return image;
     }
 }

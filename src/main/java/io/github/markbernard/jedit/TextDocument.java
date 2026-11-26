@@ -29,6 +29,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
@@ -88,7 +91,7 @@ import io.github.markbernard.jedit.theme.ThemeManager;
 public class TextDocument extends JPanel implements DocumentListener, KeyListener {
     private static final long serialVersionUID = -6937922244390572212L;
     private static final String[] NEW_LINE_CHAR = {"\n", "\r\n"};
-
+    private static final Object DIRTY_LOCK = new Object();
     
     private final transient JEdit jEdit;
     private RSyntaxTextArea syntaxTextArea;
@@ -132,7 +135,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
 
     
     private void createGui() {
-        dirty = false;
+        setDirty(false);
         setLayout(new BorderLayout());
         syntaxTextArea = new RSyntaxTextArea(20, 60);
         syntaxTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_NONE);
@@ -161,7 +164,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @return The title for this document.
      */
     public String getTitle() {
-        return (dirty ? "*" : "") + fileName;
+        return (isDirty() ? "*" : "") + fileName;
     }
 
     /**
@@ -380,14 +383,18 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
      * @return the dirty
      */
     public boolean isDirty() {
-        return dirty;
+        synchronized (DIRTY_LOCK) {
+            return dirty;
+        }
     }
 
     /**
      * @param dirty the dirty to set
      */
     public void setDirty(boolean dirty) {
-        this.dirty = dirty;
+        synchronized (DIRTY_LOCK) {
+            this.dirty = dirty;
+        }
     }
 
     /**
@@ -491,7 +498,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                 }
             }
             undoManager.discardAllEdits();
-            dirty = false;
+            setDirty(false);
             readOnly = !path.canWrite() && !Files.isWritable(path.toPath());
             updateStatusBar(syntaxTextArea.getCaretPosition());
         } catch (FileNotFoundException e) {
@@ -575,7 +582,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                 result = saveAs();
             } else {
                 saveFile();
-                dirty = false;
+                setDirty(false);
                 
                 result = true;
             }
@@ -602,7 +609,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                 parseFileName(selectedFilePath);
                 setLanguageInfo(DocumentFormatType.determineFormatFromFile(selectedFilePath));
                 saveFile();
-                dirty = false;
+                setDirty(false);
             } else {
                 result = false;
             }
@@ -638,6 +645,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                     }
                 }
                 out.write(syntaxTextArea.getText());
+                setDirty(false);
             } catch (FileNotFoundException e) {
                 String errorMessage = "Unable to create the file: " + path + "\n" + e.getMessage();
                 if (readOnly) {
@@ -676,7 +684,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     private DirtyStatus checkDirty() {
         DirtyStatus result = DirtyStatus.DONT_SAVE_FILE;
         
-        if (dirty) {
+        if (isDirty()) {
             String saveFilePath = (fileName.equals(newFileName) ? fileName : applicationPreferences.getCurrentFilePath() + ApplicationPreferences.FILE_PATH_SEPARATOR + fileName);
             int choice = JOptionPane.showOptionDialog(this, 
                     "Do you want to save changes to " + saveFilePath + "?", 
@@ -822,8 +830,8 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
     }
     
     private void documentUpdated() {
-        if (!dirty) {
-            dirty = true;
+        if (!isDirty()) {
+            setDirty(true);
             jEdit.setTitle();
         }
         repaint();
@@ -861,6 +869,18 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         syntaxTextArea.setTabSize(applicationPreferences.getTabSize());
         syntaxTextArea.setTabsEmulated(applicationPreferences.isSpacesInsteadOfTabs());
         textScrollPane.setLineNumbersEnabled(applicationPreferences.isEnableLineNumbers());
+    }
+    
+    /**
+     * @param printRequestAttributeSet
+     * @throws PrinterException 
+     */
+    public void doPrint(PrintRequestAttributeSet printRequestAttributeSet) throws PrinterException {
+        PrinterJob printerJob = PrinterJob.getPrinterJob();
+        if (printerJob.printDialog(printRequestAttributeSet)) {
+            printerJob.setPrintable(syntaxTextArea);
+            printerJob.print();
+        }
     }
 
     /**

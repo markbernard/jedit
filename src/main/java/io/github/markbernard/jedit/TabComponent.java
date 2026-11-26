@@ -49,8 +49,8 @@ public class TabComponent extends JPanel implements MouseListener {
         setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
         setOpaque(false);
         setLayout(new BorderLayout(10, 0));
-        simpleIcon = new SimpleIcon(new IconGenerator("/icons/TabClose.png").loadImage(), 
-                new IconGenerator("/icons/TabCloseHover.png").loadImage(), new IconGenerator("/icons/TabClosePressed.png").loadImage());
+        simpleIcon = new SimpleIcon(new IconGenerator("/icons/TabClose.png").loadIcon(), 
+                new IconGenerator("/icons/TabCloseHover.png").loadIcon(), new IconGenerator("/icons/TabClosePressed.png").loadIcon());
         add(simpleIcon, BorderLayout.WEST);
         simpleIcon.addMouseListener(this);
         labelName = new JLabel(componentName);

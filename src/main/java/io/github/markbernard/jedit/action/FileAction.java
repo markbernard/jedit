@@ -71,8 +71,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "New");
             putValue(Action.SHORT_DESCRIPTION, "Create a new blank document.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/NewFileSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/NewFile.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/NewFileSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/NewFile.png").loadIcon());
         }
         
         @Override
@@ -101,8 +101,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "Open...");
             putValue(Action.SHORT_DESCRIPTION, "Load a document from disk.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/OpenFileSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/OpenFile.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/OpenFileSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/OpenFile.png").loadIcon());
         }
         
         @Override
@@ -131,8 +131,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "Save");
             putValue(Action.SHORT_DESCRIPTION, "Save a document to disk.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/SaveSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Save.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/SaveSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Save.png").loadIcon());
         }
         
         @Override
@@ -161,8 +161,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, 5);
             putValue(Action.NAME, "Save As...");
             putValue(Action.SHORT_DESCRIPTION, "Save the document with a new name.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/SaveAsSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/SaveAs.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/SaveAsSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/SaveAs.png").loadIcon());
         }
         
         @Override
@@ -190,8 +190,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_U);
             putValue(Action.NAME, "Page Setup...");
             putValue(Action.SHORT_DESCRIPTION, "Edit printer page settings.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/PageSetupSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/PageSetup.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/PageSetupSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/PageSetup.png").loadIcon());
         }
         
         @Override
@@ -220,8 +220,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
             putValue(Action.NAME, "Print...");
             putValue(Action.SHORT_DESCRIPTION, "Open the print dialog.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/PrintSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Print.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/PrintSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Print.png").loadIcon());
         }
         
         @Override
@@ -249,8 +249,8 @@ public class FileAction extends AbstractAction {
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
             putValue(Action.NAME, "Exit");
             putValue(Action.SHORT_DESCRIPTION, "Exit JNotepad.");
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/ExitSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Exit.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/ExitSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Exit.png").loadIcon());
         }
         
         @Override

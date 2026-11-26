@@ -63,8 +63,8 @@ public class HelpAction extends AbstractAction {
             putValue(NAME, Translations.getString("HelpAction.ViewHelpAction.constuctor.viewhelp"));
             putValue(MNEMONIC_KEY, KeyEvent.VK_V);
             putValue(Action.SHORT_DESCRIPTION, Translations.getString("HelpAction.ViewHelpAction.constuctor.open"));
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/HelpSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Help.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/HelpSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/Help.png").loadIcon());
         }
 
         @Override
@@ -88,8 +88,8 @@ public class HelpAction extends AbstractAction {
             this.jEdit = jEdit;
             putValue(NAME, Translations.getString("HelpAction.AboutAction.constuctor.about"));
             putValue(MNEMONIC_KEY, KeyEvent.VK_A);
-            putValue(Action.SMALL_ICON, new IconGenerator("/icons/AboutSmall.png").loadImage());
-            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/About.png").loadImage());
+            putValue(Action.SMALL_ICON, new IconGenerator("/icons/AboutSmall.png").loadIcon());
+            putValue(Action.LARGE_ICON_KEY, new IconGenerator("/icons/About.png").loadIcon());
         }
 
         @Override
