@@ -32,6 +32,9 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.markbernard.jedit.action.DialogAction;
 
 /**
@@ -39,6 +42,7 @@ import io.github.markbernard.jedit.action.DialogAction;
  *
  */
 public abstract class BasicDialog extends JDialog implements WindowListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicDialog.class);
     private static final long serialVersionUID = 5010359693222917600L;
 
     /**
@@ -85,7 +89,7 @@ public abstract class BasicDialog extends JDialog implements WindowListener {
             result = content.toString();
         } catch (Exception e) {
             //should not occur since we are dealing with a local resource
-            e.printStackTrace();
+            LOGGER.error("Could not load text from resource: {}", ref, e);
         }
         
         return result;

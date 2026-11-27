@@ -47,6 +47,8 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.stream.Format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.markbernard.jedit.ApplicationPreferences;
 import io.github.markbernard.jedit.DocumentFormatType;
@@ -60,6 +62,7 @@ import io.github.markbernard.jedit.theme.ThemeManager;
  * 
  */
 public class ThemeDialog extends JDialog implements WindowListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeDialog.class);
     private static final long serialVersionUID = -3171638741388684292L;
 
     private static final String COLOR = "color";
@@ -492,7 +495,7 @@ public class ThemeDialog extends JDialog implements WindowListener {
                 currentTheme = ThemeManager.getDefaultTheme(currentExtension);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Could not load theme.", e);
         }
     }
     
@@ -547,14 +550,15 @@ public class ThemeDialog extends JDialog implements WindowListener {
             Theme theme = Theme.load(new ByteArrayInputStream(bout.toByteArray()));
             theme.apply(syntaxTextArea);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Could not apply theme.", e);
         }
     }
     
     private void loadSample() {
         Reader in = null;
+        String samplePath = "/text/sample." + currentExtension;
         try {
-            InputStream iin = getClass().getResourceAsStream("/text/sample." + currentExtension);
+            InputStream iin = getClass().getResourceAsStream(samplePath);
             if (iin != null) {
                 in = new InputStreamReader(iin, StandardCharsets.UTF_8);
                 StringBuilder content = new StringBuilder();
@@ -567,7 +571,7 @@ public class ThemeDialog extends JDialog implements WindowListener {
                 scrollPane.getGutter().toggleBookmark(3);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Could not load sample: {}", samplePath, e);
         } finally {
             ResourceCleanup.close(in);
         }
@@ -620,7 +624,7 @@ public class ThemeDialog extends JDialog implements WindowListener {
                 getThemeValues();
                 ThemeManager.save(currentTheme, currentExtension);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Could not save theme.", e);
             }
         }
     }

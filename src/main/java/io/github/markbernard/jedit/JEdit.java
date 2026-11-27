@@ -61,6 +61,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 
 import org.apache.jorphan.gui.MenuScroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.markbernard.jedit.action.DocumentAction;
 import io.github.markbernard.jedit.action.EditAction;
@@ -77,6 +79,7 @@ import io.github.markbernard.jedit.dialog.ThemeDialog;
  */
 public class JEdit implements WindowListener, KeyListener {
     private static final String APPLICATION_TITLE = "JEdit";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JEdit.class);
     private static final Object TAB_LOCK = new Object();
 
     private boolean insertPressed = false;
@@ -787,8 +790,8 @@ public class JEdit implements WindowListener, KeyListener {
                 printRequestAttributeSet = new HashPrintRequestAttributeSet();
             }
             currentDocument.doPrint(printRequestAttributeSet);
-        } catch (PrinterException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("An error occurred trying to print {}/{}", currentDocument.getFilePath(), currentDocument.getFileName(), e);
         }
     }
 
@@ -917,7 +920,7 @@ public class JEdit implements WindowListener, KeyListener {
                 Font font = Font.createFont(Font.TRUETYPE_FONT, JEdit.class.getResourceAsStream(path));
                 ge.registerFont(font);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("An error occurred trying to load font {}", path, e);
             }
         }
         try {

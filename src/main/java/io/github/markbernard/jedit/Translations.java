@@ -9,10 +9,14 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  */
 public class Translations {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Translations.class);
     private static ResourceBundle bundle = null;
     
     private Translations() {}
@@ -45,7 +49,7 @@ public class Translations {
                 }
                 bundle = new PropertyResourceBundle(stream);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not load translation file for: {}", key, e);
             }
         }
         

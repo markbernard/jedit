@@ -80,6 +80,8 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.RUndoManager;
 import org.fife.ui.rtextarea.TextMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.markbernard.jedit.dialog.EncodingDialog;
 import io.github.markbernard.jedit.dialog.GoToDialog;
@@ -90,6 +92,7 @@ import io.github.markbernard.jedit.theme.ThemeManager;
  */
 public class TextDocument extends JPanel implements DocumentListener, KeyListener {
     private static final long serialVersionUID = -6937922244390572212L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextDocument.class);
     private static final String[] NEW_LINE_CHAR = {"\n", "\r\n"};
     private static final Object DIRTY_LOCK = new Object();
     
@@ -432,7 +435,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
         } catch (Exception e) {
             //not critical if the position in the
             //status bar does not get updated.
-            e.printStackTrace();
+            LOGGER.warn("Could not update status bar.", e);
         }
     }
     
@@ -474,7 +477,7 @@ public class TextDocument extends JPanel implements DocumentListener, KeyListene
                     document.remove(position, trimLength);
                 }
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not find position to insert text.", e);
             }
             jEdit.setInsertMode(false);
         }

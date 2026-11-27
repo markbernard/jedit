@@ -28,10 +28,14 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Mark Bernard
  */
 public class IconGenerator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconGenerator.class);
     private static final Map<String, Icon> iconCache = new HashMap<>();
     private static final Map<String, Image> imageCache = new HashMap<>();
     private final String path;
@@ -54,7 +58,7 @@ public class IconGenerator {
                 icon = new ImageIcon(ImageIO.read(getClass().getResourceAsStream(path)));
                 iconCache.put(path, icon);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not load icon from: {}", path, e);
             }
         }
         
@@ -72,7 +76,7 @@ public class IconGenerator {
                 image = ImageIO.read(getClass().getResourceAsStream(path));
                 imageCache.put(path, image);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not load image from: {}", path, e);
             }
         }
         

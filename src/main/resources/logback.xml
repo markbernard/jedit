@@ -1,0 +1,46 @@
+<configuration>
+    <!-- Set LOG_DIR based on the Operating System -->
+    <if condition='property("os.name").toLowerCase().contains("win")'>
+        <then>
+            <property name="LOG_DIR" value="${LOCALAPPDATA}/jedit" />
+        </then>
+        <else>
+            <if condition='property("os.name").toLowerCase().contains("mac")'>
+                <then>
+                    <property name="LOG_DIR" value="/Users/Shared/logs/jedit" />
+                </then>
+                <else>
+                    <!-- Default to Linux / Unix path -->
+                    <property name="LOG_DIR" value="/var/log/jedit" />
+                </else>
+            </if>
+        </else>
+    </if>
+
+    <!-- File Appender using the dynamic LOG_DIR -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/jedit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/jedit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <logger name="io.github.markbernard.jedit" level="${JEDIT_LOG_LEVEL}" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
