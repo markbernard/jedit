@@ -110,6 +110,7 @@ public class ConfigurationDialog extends BasicDialog {
         });
 
         pack();
+        setResizable(false);
     }
 
     @Override

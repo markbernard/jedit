@@ -99,6 +99,7 @@ public class GoToDialog extends BasicDialog {
     public boolean showDialog() {
         pack();
         centerDialog();
+        setResizable(false);
         setVisible(true);
         dispose();
         
