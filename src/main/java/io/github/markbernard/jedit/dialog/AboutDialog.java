@@ -33,11 +33,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Mark Bernard
  *
  */
 public class AboutDialog extends BasicDialog {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AboutDialog.class);
     private static final long serialVersionUID = -7298025013614141428L;
 
     /**
@@ -64,13 +68,11 @@ public class AboutDialog extends BasicDialog {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 String href = e.getDescription(); // Gets the raw href string
                 
-                if ("action:settings".equals(href)) {
-                    System.out.println("Custom action triggered!");
-                } else if (e.getURL() != null) {
+                if (!"action:settings".equals(href) && e.getURL() != null) {
                     try {
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOGGER.error("Could not activate link.", ex);
                     }
                 }
             }

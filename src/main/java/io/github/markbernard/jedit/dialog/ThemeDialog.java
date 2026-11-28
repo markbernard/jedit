@@ -417,12 +417,8 @@ public class ThemeDialog extends JDialog implements WindowListener {
         secondaryLanguagesBg = new ColorPicker[currentTheme.secondaryLanguages.size()];
         for (int i=0;i<currentTheme.secondaryLanguages.size();i++) {
             secondaryLanguagesBg[i] = new ColorPicker(currentTheme.secondaryLanguages.get(i).bg);
-            if (i == 0) {
-                styleSelectionsPanel.add(new JLabel("Secondary Languages"));
-            } else {
-                styleSelectionsPanel.add(new JLabel(""));
-            }
-            styleSelectionsPanel.add(new JLabel("bg"));
+           styleSelectionsPanel.add(new JLabel((i == 0) ? "Secondary Languages" : ""));
+        styleSelectionsPanel.add(new JLabel("bg"));
             styleSelectionsPanel.add(secondaryLanguagesBg[i]);
             final int index = i;
             secondaryLanguagesBg[i].addChangeListener((ChangeEvent e) -> {
@@ -439,40 +435,49 @@ public class ThemeDialog extends JDialog implements WindowListener {
         styleSelectionsPanel.add(new JLabel(""));
         for (int i=0;i<currentTheme.tokenStyles.size();i++) {
             if (currentTheme.tokenStyles.get(i).fg != null) {
-                final int index = i;
-                tokenStylesToken[i] = currentTheme.tokenStyles.get(i).token;
-                tokenStylesBold[i] = new JCheckBox("true");
-                tokenStylesBold[i].setSelected(currentTheme.tokenStyles.get(i).bold != null && currentTheme.tokenStyles.get(i).bold.booleanValue());
-                styleSelectionsPanel.add(new JLabel(Translations.getString(tokenStylesToken[i])));
-                styleSelectionsPanel.add(new JLabel("bold"));
-                styleSelectionsPanel.add(tokenStylesBold[i]);
-                tokenStylesBold[i].addChangeListener((ChangeEvent e) -> {
-                    currentTheme.tokenStyles.get(index).bold = tokenStylesBold[index].isSelected() ? Boolean.TRUE : null;
-                    applyTheme();
-                });
-                
-                tokenStylesFg[i] = new ColorPicker(currentTheme.tokenStyles.get(i).fg);
-                styleSelectionsPanel.add(new JLabel(""));
-                styleSelectionsPanel.add(new JLabel("fg"));
-                styleSelectionsPanel.add(tokenStylesFg[i]);
-                tokenStylesFg[i].addChangeListener((ChangeEvent e) -> {
-                    currentTheme.tokenStyles.get(index).fg = tokenStylesFg[index].getColorString();
-                    applyTheme();
-                });
-                
-                tokenStylesItalic[i] = new JCheckBox("true");
-                tokenStylesItalic[i].setSelected(currentTheme.tokenStyles.get(i).italic != null && currentTheme.tokenStyles.get(i).italic.booleanValue());
-                styleSelectionsPanel.add(new JLabel(""));
-                styleSelectionsPanel.add(new JLabel("italic"));
-                styleSelectionsPanel.add(tokenStylesItalic[i]);
-                tokenStylesItalic[i].addChangeListener((ChangeEvent e) -> {
-                    currentTheme.tokenStyles.get(index).italic = tokenStylesItalic[index].isSelected() ? Boolean.TRUE : null;
-                    applyTheme();
-                });
+                addTokenStylesBold(i, tokenStylesToken, styleSelectionsPanel);
+                addTokenStylesFg(i, styleSelectionsPanel);
+                addTokenStylesItalic(i, styleSelectionsPanel);
             }
         }        
     }
-    
+
+    private void addTokenStylesBold(final int i, String[] tokenStylesToken, JPanel styleSelectionsPanel) {
+        tokenStylesToken[i] = currentTheme.tokenStyles.get(i).token;
+        tokenStylesBold[i] = new JCheckBox("true");
+        tokenStylesBold[i].setSelected(currentTheme.tokenStyles.get(i).bold != null && currentTheme.tokenStyles.get(i).bold.booleanValue());
+        styleSelectionsPanel.add(new JLabel(Translations.getString(tokenStylesToken[i])));
+        styleSelectionsPanel.add(new JLabel("bold"));
+        styleSelectionsPanel.add(tokenStylesBold[i]);
+        tokenStylesBold[i].addChangeListener((ChangeEvent e) -> {
+            currentTheme.tokenStyles.get(i).bold = tokenStylesBold[i].isSelected() ? Boolean.TRUE : null;
+            applyTheme();
+        });
+    }
+
+    private void addTokenStylesFg(final int i, JPanel styleSelectionsPanel) {
+        tokenStylesFg[i] = new ColorPicker(currentTheme.tokenStyles.get(i).fg);
+        styleSelectionsPanel.add(new JLabel(""));
+        styleSelectionsPanel.add(new JLabel("fg"));
+        styleSelectionsPanel.add(tokenStylesFg[i]);
+        tokenStylesFg[i].addChangeListener((ChangeEvent e) -> {
+            currentTheme.tokenStyles.get(i).fg = tokenStylesFg[i].getColorString();
+            applyTheme();
+        });
+    }    
+
+    private void addTokenStylesItalic(final int i, JPanel styleSelectionsPanel) {
+        tokenStylesItalic[i] = new JCheckBox("true");
+        tokenStylesItalic[i].setSelected(currentTheme.tokenStyles.get(i).italic != null && currentTheme.tokenStyles.get(i).italic.booleanValue());
+        styleSelectionsPanel.add(new JLabel(""));
+        styleSelectionsPanel.add(new JLabel("italic"));
+        styleSelectionsPanel.add(tokenStylesItalic[i]);
+        tokenStylesItalic[i].addChangeListener((ChangeEvent e) -> {
+            currentTheme.tokenStyles.get(i).italic = tokenStylesItalic[i].isSelected() ? Boolean.TRUE : null;
+            applyTheme();
+        });
+    }
+
     private void createSamplePanel() {
         JPanel samplePanel = new JPanel(new BorderLayout());
         styleSplit.add(samplePanel, JSplitPane.RIGHT);

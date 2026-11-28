@@ -49,9 +49,7 @@ public class PreferencesAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(() -> {
-                jEdit.editConfiguration();
-            }, "Show Configuration Dialog").start();
+            new Thread(jEdit::editConfiguration, "Show Configuration Dialog").start();
         }
     }
 
@@ -75,9 +73,7 @@ public class PreferencesAction extends AbstractAction {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(() -> {
-                jEdit.editStyles();
-            }, "Show Theme Dialog").start();
+            new Thread(jEdit::editStyles, "Show Theme Dialog").start();
         }
     }
 }
